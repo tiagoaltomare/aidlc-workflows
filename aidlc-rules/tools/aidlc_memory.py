@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -1000,6 +1001,205 @@ def stamp_entry(workspace: Path, entry_arg: str) -> int:
     return 0
 
 
+REQ_HEADING = re.compile(r"^### Requirement: (.+?)\s*$", re.MULTILINE)
+DELTA_KINDS = ("ADDED", "MODIFIED", "REMOVED", "RENAMED")
+
+
+def normalize_block(text: str) -> str:
+    return "\n".join(line.rstrip() for line in text.strip().splitlines()).strip()
+
+
+def requirement_blocks(text: str) -> list[tuple[str, str]]:
+    matches = list(REQ_HEADING.finditer(text))
+    blocks: list[tuple[str, str]] = []
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        chunk = text[match.start():end]
+        cut = re.search(r"^## (?!#)", chunk, re.MULTILINE)
+        if cut and cut.start() > 0:
+            chunk = chunk[:cut.start()]
+        blocks.append((match.group(1).strip(), chunk.strip() + "\n"))
+    return blocks
+
+
+def delta_sections(text: str) -> dict[str, str]:
+    sections: dict[str, str] = {kind: "" for kind in DELTA_KINDS}
+    parts = re.split(r"(?=^## )", text, flags=re.MULTILINE)
+    for part in parts:
+        match = re.match(r"## (ADDED|MODIFIED|REMOVED|RENAMED) Requirements\s*\n(.*)", part, re.DOTALL)
+        if match:
+            sections[match.group(1)] += match.group(2)
+    return sections
+
+
+def living_preamble(text: str) -> str:
+    match = REQ_HEADING.search(text)
+    if not match:
+        return text if text.endswith("\n") else text + "\n"
+    return text[:match.start()]
+
+
+def render_spec(preamble: str, blocks: list[tuple[str, str]]) -> str:
+    head = preamble.rstrip() + "\n\n"
+    if not blocks:
+        return head
+    body = "\n".join(block.rstrip() + "\n" for _name, block in blocks)
+    return head + body
+
+
+def fresh_spec(capability: str) -> str:
+    return (
+        "---\n"
+        "type: Spec\n"
+        f"title: {capability}\n"
+        "status: draft\n"
+        "---\n\n"
+        f"# {capability} specification\n\n"
+        "## Requirements\n\n"
+    )
+
+
+def change_dir(workspace: Path, change_id: str) -> Path:
+    if not change_id or change_id == "archive" or "/" in change_id or "\\" in change_id or ".." in change_id:
+        raise ValueError(f"invalid change id: {change_id}")
+    return openspec_dir(workspace) / "changes" / change_id
+
+
+def analyze_change(workspace: Path, change_id: str) -> dict:
+    directory = change_dir(workspace, change_id)
+    conflicts: list[dict] = []
+    warnings: list[dict] = []
+    if not directory.is_dir():
+        return {"change_id": change_id, "conflicts": [{"code": "missing_change", "requirement": ""}], "warnings": []}
+    planned: dict[str, list[tuple[str, str, str]]] = {}
+    for path in sorted(directory.rglob("*.md")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        relative = path.relative_to(workspace).as_posix()
+        if "<<<<<<<" in text:
+            conflicts.append({"code": "conflict_markers", "path": relative, "requirement": ""})
+        if len(path.parents) < 2 or path.parent.parent.name != "specs" or path.name != "spec.md":
+            continue
+        capability = path.parent.name
+        sections = delta_sections(text)
+        if sections["RENAMED"].strip():
+            conflicts.append({"code": "rename_requires_human", "path": relative, "requirement": ""})
+        seen: dict[str, str] = {}
+        for kind in ("ADDED", "MODIFIED", "REMOVED"):
+            for name, block in requirement_blocks(sections[kind]):
+                if name in seen and normalize_block(seen[name]) != normalize_block(block):
+                    conflicts.append({"code": "duplicate_requirement", "path": relative, "requirement": name})
+                seen[name] = block
+                planned.setdefault(capability, []).append((kind, name, block))
+    ops: list[dict] = []
+    for capability, actions in planned.items():
+        living = openspec_dir(workspace) / "specs" / capability / "spec.md"
+        current = living.read_text(encoding="utf-8", errors="replace") if living.is_file() else ""
+        if "<<<<<<<" in current:
+            conflicts.append({"code": "conflict_markers", "path": living.relative_to(workspace).as_posix(), "requirement": ""})
+        existing = {name: block for name, block in requirement_blocks(current)}
+        for kind, name, block in actions:
+            if kind == "ADDED":
+                if name in existing:
+                    if normalize_block(existing[name]) == normalize_block(block):
+                        warnings.append({"code": "already_present", "requirement": name, "capability": capability})
+                    else:
+                        conflicts.append({"code": "added_exists", "requirement": name, "capability": capability})
+                else:
+                    ops.append({"op": "add", "capability": capability, "name": name, "block": block})
+            elif kind == "MODIFIED":
+                if name not in existing:
+                    conflicts.append({"code": "modified_missing", "requirement": name, "capability": capability})
+                else:
+                    ops.append({"op": "replace", "capability": capability, "name": name, "block": block})
+            elif kind == "REMOVED":
+                if name not in existing:
+                    conflicts.append({"code": "removed_missing", "requirement": name, "capability": capability})
+                else:
+                    ops.append({"op": "remove", "capability": capability, "name": name, "block": block})
+    archive_dest = openspec_dir(workspace) / "changes" / "archive" / f"{now_iso()[:10]}-{change_id}"
+    if archive_dest.exists():
+        conflicts.append({"code": "archive_exists", "requirement": "", "path": archive_dest.relative_to(workspace).as_posix()})
+    return {
+        "change_id": change_id,
+        "conflicts": conflicts,
+        "warnings": warnings,
+        "operations": ops,
+    }
+
+
+def apply_operations(text: str, capability: str, operations: list[dict]) -> str:
+    if not text:
+        text = fresh_spec(capability)
+    preamble = living_preamble(text)
+    blocks = requirement_blocks(text)
+    for operation in operations:
+        name = operation["name"]
+        if operation["op"] == "add":
+            blocks.append((name, operation["block"].strip() + "\n"))
+        elif operation["op"] == "replace":
+            blocks = [(name, operation["block"].strip() + "\n") if current == name else (current, block) for current, block in blocks]
+        elif operation["op"] == "remove":
+            blocks = [(current, block) for current, block in blocks if current != name]
+    return render_spec(preamble, blocks)
+
+
+def archive_check(workspace: Path, change_id: str) -> tuple[int, dict]:
+    marker = knowledge_dir(workspace) / ".aidlc-memory"
+    enabled, _config = load_marker(marker)
+    if not enabled:
+        return 2, {"enabled": False, "conflicts": [{"code": "memory_off"}]}
+    try:
+        report = analyze_change(workspace, change_id)
+    except ValueError as exc:
+        return 2, {"conflicts": [{"code": "invalid_change", "requirement": str(exc)}]}
+    public = {key: value for key, value in report.items() if key != "operations"}
+    return (1 if report["conflicts"] else 0), public
+
+
+def archive_apply(workspace: Path, change_id: str, approved: bool) -> tuple[int, dict]:
+    if not approved:
+        return 2, {"applied": False, "reason": "approval_required"}
+    code, public = archive_check(workspace, change_id)
+    if code != 0:
+        return code, public
+    report = analyze_change(workspace, change_id)
+    by_capability: dict[str, list[dict]] = {}
+    for operation in report["operations"]:
+        by_capability.setdefault(operation["capability"], []).append(operation)
+    for capability, operations in by_capability.items():
+        living = openspec_dir(workspace) / "specs" / capability / "spec.md"
+        current = living.read_text(encoding="utf-8", errors="replace") if living.is_file() else ""
+        updated = apply_operations(current, capability, operations)
+        living.parent.mkdir(parents=True, exist_ok=True)
+        living.write_text(updated, encoding="utf-8")
+    directory = change_dir(workspace, change_id)
+    dest = openspec_dir(workspace) / "changes" / "archive" / f"{now_iso()[:10]}-{change_id}"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(directory), str(dest))
+    append_event(workspace, {"event": "archive", "change_id": change_id, "result": "applied"})
+    return 0, {"applied": True, "change_id": change_id, "archive": dest.relative_to(workspace).as_posix(), "warnings": report["warnings"]}
+
+
+def lint_openspec(workspace: Path) -> tuple[int, dict]:
+    root = openspec_dir(workspace)
+    errors: list[dict] = []
+    if not root.exists():
+        return 0, {"ok": True, "errors": []}
+    allowed = {f"{kind} Requirements" for kind in DELTA_KINDS}
+    for path in sorted(root.rglob("*.md")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        relative = path.relative_to(workspace).as_posix()
+        if "<<<<<<<" in text or ">>>>>>>" in text:
+            errors.append({"path": relative, "code": "conflict_markers"})
+        names = [name for name, _block in requirement_blocks(text)]
+        if len(names) != len(set(names)):
+            errors.append({"path": relative, "code": "duplicate_requirement"})
+        for heading in re.findall(r"^## (.+?)\s*$", text, re.MULTILINE):
+            if heading.endswith(" Requirements") and heading not in allowed:
+                errors.append({"path": relative, "code": "unknown_section", "heading": heading})
+    return (1 if errors else 0), {"ok": not errors, "errors": errors}
+
+
 def emit(workspace: Path, event: str, fields: dict) -> int:
     marker = knowledge_dir(workspace) / ".aidlc-memory"
     enabled, _config = load_marker(marker)
@@ -1049,6 +1249,15 @@ def build_parser() -> argparse.ArgumentParser:
     handoff.add_argument("--approved", required=True, choices=["true", "false"])
 
     sub.add_parser("manual", help="Print the no-Python procedure")
+
+    archive_check_parser = sub.add_parser("archive-check", help="Report OpenSpec conflicts without writing")
+    archive_check_parser.add_argument("--change", required=True)
+
+    archive_apply_parser = sub.add_parser("archive-apply", help="Merge a clean change after human approval")
+    archive_apply_parser.add_argument("--change", required=True)
+    archive_apply_parser.add_argument("--approved", action="store_true")
+
+    sub.add_parser("lint", help="Check OpenSpec heading shape and conflict markers")
     return parser
 
 
@@ -1074,6 +1283,18 @@ def main(argv: list[str] | None = None) -> int:
             return emit(workspace, "archive", {"change_id": args.change_id, "result": args.result})
         approved = args.approved == "true"
         return emit(workspace, "handoff", {"cycle": args.cycle, "approved": approved})
+    if args.command == "archive-check":
+        code, report = archive_check(workspace, args.change)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        return code
+    if args.command == "archive-apply":
+        code, report = archive_apply(workspace, args.change, approved=args.approved)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        return code
+    if args.command == "lint":
+        code, report = lint_openspec(workspace)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        return code
     parser.error(f"unknown command {args.command}")
     return 2
 

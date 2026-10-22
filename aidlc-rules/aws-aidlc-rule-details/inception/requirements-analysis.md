@@ -135,6 +135,20 @@ Present the question file to the user and STOP.
    - Incorporate user's answers to clarifying questions
    - Provide brief summary of key requirements
 
+### Step 7.1: Open a change (memory extension only)
+
+Skip this step when `aidlc-docs/knowledge/.aidlc-memory` is absent.
+
+One user intent becomes one `aidlc-docs/openspec/changes/<change-id>/` directory. `change-id` is kebab-case.
+
+Create these files from the templates:
+
+- `proposal.md` from `templates/openspec-proposal.md`
+- `tasks.md` from `templates/openspec-tasks.md`
+- `specs/<capability>/spec.md` from `templates/openspec-delta.md`
+
+**MANDATORY**: `requirements.md` references the change id and the requirement ids. It does not copy requirement bodies from the spec or the delta. A requirement in `requirements.md` is a pointer, for example `change add-login / requirement User can login`, plus the intent summary. The spec text stays in `openspec/` only.
+
 ### Step 8: Update State Tracking
 
 Update `aidlc-docs/aidlc-state.md`:
