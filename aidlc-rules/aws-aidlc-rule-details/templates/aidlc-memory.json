@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "protocol": "aidlc-memory",
+  "protocol_version": "1",
+  "okf_version": "0.2",
+  "stale_ratio": 0.3,
+  "aggregate_ratio": 0.3,
+  "max_delta_streak": 3,
+  "budget_tokens": 2000
+}
