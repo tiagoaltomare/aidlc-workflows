@@ -333,7 +333,7 @@ Present completion message in this structure:
 > **You may:**
 >
 > 🔧 **Request Changes** - Ask for modifications to the build and test instructions based on your review
-> ✅ **Approve & Continue** - Approve build and test results and proceed to **Operations**
+> ✅ **Approve & Continue** - Approve build and test results and proceed to **Operations** when the memory extension is off, or to **Cycle Close** when `aidlc-docs/knowledge/.aidlc-memory` exists
 
 ---
 ```

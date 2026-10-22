@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-10-22
+
+### Documentation
+
+- specify the opt-in memory protocol, OKF v0.2 frontmatter, and templates
+- point v1 install and AI-assisted setup at the tiagoaltomare fork
+- document knowledge/ and openspec/ under aidlc-docs/
+
+### Features
+
+- add memory between cycles: check and stamp, incremental reverse engineering, cycle close, and OpenSpec archive
+
+### Tests
+
+- add the Grok Build trial harness, fault injection, and conflict hooks
+
 ## [1.0.1] - 2026-06-30
 
 ### Documentation

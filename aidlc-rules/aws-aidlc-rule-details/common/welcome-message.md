@@ -73,7 +73,7 @@ AI-DLC is a structured yet flexible software development process that adapts to 
 
 **CONSTRUCTION PHASE** - *Detailed Design, Implementation & Test*
 - **Purpose**: Determines HOW to build it
-- **Activities**: Detailed design (when needed), code generation, comprehensive testing
+- **Activities**: Detailed design (when needed), code generation, comprehensive testing. When the memory extension is on, Cycle Close runs after Build and Test.
 - **Output**: Working code, tests, build instructions
 - **Your Role**: Review designs, approve implementation plans, validate results
 

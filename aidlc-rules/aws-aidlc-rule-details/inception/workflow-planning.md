@@ -20,6 +20,10 @@
 - stories.md
 - personas.md
 
+### 1.4 Load OpenSpec references (memory extension only)
+
+When `aidlc-docs/knowledge/.aidlc-memory` exists, read requirement headings and change ids from `aidlc-docs/openspec/`. Do not copy requirement bodies into the execution plan. Record the cycle's `change-id` on the plan. When the marker is absent, skip this load.
+
 ## Step 2: Detailed Scope and Impact Analysis
 
 **Now that we have complete context (requirements + stories), perform detailed analysis:**
@@ -354,6 +358,10 @@ Update `aidlc-docs/aidlc-state.md`:
 - **Total Stages**: [Number]
 - **Stages to Execute**: [List]
 - **Stages to Skip**: [List with reasons]
+
+When the memory extension is on, also record:
+- **Change**: [change-id]
+- Include **Cycle Close** in the stages to execute. When the marker is absent, do not add Cycle Close.
 
 ## Stage Progress
 

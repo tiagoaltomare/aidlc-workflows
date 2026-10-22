@@ -26,6 +26,10 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 - Load `common/question-format-guide.md` for question formatting rules
 - Reference these throughout the workflow execution
 
+**Memory extension**: Check for `aidlc-docs/knowledge/.aidlc-memory` at workflow start.
+- **Marker present** (and not JSON with `"enabled": false`): Load `common/memory-protocol.md`. `knowledge/` and `openspec/` stay inside `aidlc-docs/`.
+- **Marker absent**: Do not load the memory rules. Do not create `knowledge/` or `openspec/`. Every stage below follows its extension-off path, which is the behavior without this extension.
+
 ## MANDATORY: Extensions Loading (Context-Optimized)
 **CRITICAL**: At workflow start, scan the `extensions/` directory recursively but load ONLY lightweight opt-in files — NOT full rule files. Full rule files are loaded on-demand after the user opts in.
 
@@ -85,8 +89,8 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 **Focus**: Determine WHAT to build and WHY
 
 **Stages in INCEPTION PHASE**:
-- Workspace Detection (ALWAYS)
-- Reverse Engineering (CONDITIONAL - Brownfield only)
+- Workspace Detection (ALWAYS). When the memory marker exists, cycle start is part of this stage, not a separate stage.
+- Reverse Engineering (CONDITIONAL - Brownfield only). When the memory marker exists, the approved mode is skip, delta, or full.
 - Requirements Analysis (ALWAYS - Adaptive depth)
 - User Stories (CONDITIONAL)
 - Workflow Planning (ALWAYS)
@@ -104,26 +108,34 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Scan workspace for existing code
    - Determine if brownfield or greenfield
    - Check for existing reverse engineering artifacts
-4. Determine next phase: Reverse Engineering (if brownfield and no artifacts) OR Requirements Analysis
-5. **MANDATORY**: Log findings in audit.md
+4. Determine next phase:
+   - **Memory off**: Reverse Engineering (if brownfield and no artifacts) OR Requirements Analysis
+   - **Memory on**: follow `inception/cycle-start.md` for a new cycle, or resume an in-progress cycle. The next phase is Reverse Engineering only when the approved mode is delta or full.
+5. **MANDATORY**: Log findings in audit.md. When memory is on, the reverse-engineering choice is a `## Memory RE Decision` block, including the raw user reply.
 6. Present completion message to user (see workspace-detection.md for message formats)
-7. Automatically proceed to next phase
+7. Automatically proceed to next phase after the memory decision is approved. When memory is off, no extra approval is required at this stage.
 
 ## Reverse Engineering (CONDITIONAL - Brownfield Only)
 
-**Execute IF**:
+**Execute IF** (memory extension off):
 - Existing codebase detected
 - No previous reverse engineering artifacts found
 
-**Skip IF**:
+**Skip IF** (memory extension off):
 - Greenfield project
 - Previous reverse engineering artifacts exist
+
+**When the memory marker exists**, replace that binary choice with the mode the human approved in cycle start. The model does not choose the mode and does not compute hashes.
+- **skip**: do not execute this stage
+- **delta**: execute `inception/reverse-engineering.md` in delta mode. Rescan only the stale entries and uncovered files from `aidlc-docs/knowledge/code/.stale.json`. Do not analyze packages the check reports as current.
+- **full**: analyze all packages and components
 
 **Execution**:
 1. **MANDATORY**: Log start of reverse engineering in audit.md
 2. Load all steps from `inception/reverse-engineering.md`
 3. Execute reverse engineering:
-   - Analyze all packages and components
+   - **Memory off, or approved mode full**: Analyze all packages and components
+   - **Approved mode delta**: Rescan only stale entries and uncovered files
    - Generate a business overview of the whole system covering the business transactions
    - Generate architecture documentation
    - Generate code structure documentation
@@ -132,6 +144,8 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Generate Interaction Diagrams depicting how business transactions are implemented across components
    - Generate technology stack documentation
    - Generate dependencies documentation
+
+   When the approved mode is delta, update those artifacts only for the rescanned scope. Do not rewrite codekb entries the check reports as current.
 
 4. **Wait for Explicit Approval**: Present detailed completion message (see reverse-engineering.md for message format) - DO NOT PROCEED until user confirms
 5. **MANDATORY**: Log user's response in audit.md with complete raw input
@@ -302,6 +316,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
   - Infrastructure Design (CONDITIONAL, per-unit)
   - Code Generation (ALWAYS, per-unit)
 - Build and Test (ALWAYS - after all units complete)
+- Cycle Close (CONDITIONAL - only when the memory marker exists, after Build and Test, before Operations)
 
 **Note**: Each unit is completed fully (design + code) before moving to the next unit.
 
@@ -417,8 +432,25 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Performance test instructions (if applicable)
    - Additional test instructions as needed (contract tests, security tests, e2e tests)
 4. Create instruction files in build-and-test/ subdirectory: build-instructions.md, unit-test-instructions.md, integration-test-instructions.md, performance-test-instructions.md, build-and-test-summary.md
-5. **Wait for Explicit Approval**: Ask: "**Build and test instructions complete. Ready to proceed to Operations stage?**" - DO NOT PROCEED until user confirms
+5. **Wait for Explicit Approval**:
+   - **Memory off**: Ask: "**Build and test instructions complete. Ready to proceed to Operations stage?**" - DO NOT PROCEED until user confirms
+   - **Memory on**: Ask: "**Build and test instructions complete. Ready to proceed to Cycle Close?**" - DO NOT PROCEED until user confirms, then run Cycle Close before Operations
 6. **MANDATORY**: Log user's response in audit.md with complete raw input
+
+---
+
+## Cycle Close (CONDITIONAL - memory extension only)
+
+**Execute IF**: `aidlc-docs/knowledge/.aidlc-memory` exists and is enabled.
+
+**Skip IF**: The memory marker is absent. Build and Test then proceeds to Operations as before.
+
+**Execution**:
+1. **MANDATORY**: Log the start of cycle close in audit.md
+2. Load all steps from `construction/cycle-close.md`
+3. Execute cycle close. An OpenSpec conflict blocks. The handoff requires human approval. Do not continue while either gate is open.
+4. **MANDATORY**: Log the handoff approval in audit.md with the complete raw input
+5. Continue to Operations only after the handoff is approved
 
 ---
 
@@ -529,6 +561,16 @@ The Operations stage will eventually include:
 │   │   │   └── code/               # Markdown summaries only
 │   │   └── build-and-test/
 │   ├── operations/                 # 🟡 OPERATIONS PHASE (placeholder)
+│   ├── knowledge/                  # Opt-in memory bundle (only when .aidlc-memory exists)
+│   │   ├── .aidlc-memory
+│   │   ├── index.md
+│   │   ├── log.md
+│   │   ├── code/
+│   │   ├── adr/
+│   │   └── handoff/
+│   ├── openspec/                   # Opt-in change specs (only when memory is on)
+│   │   ├── specs/
+│   │   └── changes/
 │   ├── aidlc-state.md
 │   └── audit.md
 ```

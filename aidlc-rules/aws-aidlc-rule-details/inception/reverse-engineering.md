@@ -6,12 +6,20 @@
 
 **Skip when**: Greenfield project (no existing code)
 
-**Rerun behavior**: Rerun is controlled by workspace-detection.md. If existing reverse engineering artifacts are found and are still current, they are loaded and reverse engineering is skipped. If artifacts are stale (older than the codebase's last significant modification) or the user explicitly requests a rerun, reverse engineering executes again to ensure artifacts reflect current code state
+**Rerun behavior**: When the memory marker is absent, rerun is controlled by workspace-detection.md. If existing reverse engineering artifacts are found and are still current, they are loaded and reverse engineering is skipped. If artifacts are stale (older than the codebase's last significant modification) or the user explicitly requests a rerun, reverse engineering executes again to ensure artifacts reflect current code state.
+
+When `aidlc-docs/knowledge/.aidlc-memory` exists, workspace detection and `inception/cycle-start.md` choose skip, delta, or full. The model does not compute hashes and does not replace the approved mode.
+
+**Delta mode**: Rescan only paths in `stale_sources` and `uncovered` from `aidlc-docs/knowledge/code/.stale.json`, and rewrite only codekb entries whose status is `stale` plus any narrow entry that owns a noted source. Do not analyze packages the check reports as current. Do not regenerate current entries.
+
+**Full mode**: Analyze all packages, as in the steps below.
 
 ## Step 1: Multi-Package Discovery
 
+**Delta mode**: Limit every part of this step to the stale and uncovered set. Skip packages that do not intersect that set.
+
 ### 1.1 Scan Workspace
-- All packages (not just mentioned ones)
+- All packages in scope (not just mentioned ones). In delta mode, scope is the stale and uncovered set. Otherwise, scope is the whole workspace.
 - Package relationships via config files
 - Package types: Application, CDK/Infrastructure, Models, Clients, Tests
 
@@ -275,6 +283,10 @@ Create `aidlc-docs/inception/reverse-engineering/reverse-engineering-timestamp.m
 - [x] technology-stack.md
 - [x] dependencies.md
 - [x] code-quality-assessment.md
+
+When the memory extension is on, also record:
+- **source_commit**: [git HEAD, or unversioned]
+- **RE Mode**: [delta/full]
 ```
 
 ## Step 11: Update State Tracking
@@ -309,3 +321,13 @@ Update `aidlc-docs/aidlc-state.md`:
 
 - **MANDATORY**: Do not proceed until user explicitly approves
 - **MANDATORY**: Log user's response in audit.md with complete raw input
+
+## Step 14: Stamp the codekb (memory extension only)
+
+Skip this step when the memory marker is absent.
+
+After the approval in Step 13:
+
+1. Write or update `aidlc-docs/knowledge/code/*.md` from `templates/codekb-entry.md` for the scope of this scan. Delta mode does not rewrite entries the check reported as current.
+2. Run `aidlc_memory.py stamp` on each entry in scope. The script writes `source_commit` and each `sha256`. Do not calculate or type a hash yourself.
+3. If stamp exits 1, a listed source is missing. Fix `sources` and stamp again before continuing.

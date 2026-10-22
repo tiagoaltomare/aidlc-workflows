@@ -9,11 +9,11 @@
 
 ## The Three-Phase Lifecycle:
 • **INCEPTION PHASE**: Planning and architecture (Workspace Detection + conditional phases + Workflow Planning)
-• **CONSTRUCTION PHASE**: Design, implementation, build and test (per-unit design + Code Generation + Build & Test)
+• **CONSTRUCTION PHASE**: Design, implementation, build and test (per-unit design + Code Generation + Build & Test). Cycle Close runs after Build and Test only when the memory extension is on.
 • **OPERATIONS PHASE**: Placeholder for future deployment and monitoring workflows
 
 ## The Adaptive Workflow:
-• **Workspace Detection** (always) → **Reverse Engineering** (brownfield only) → **Requirements Analysis** (always, adaptive depth) → **Conditional Phases** (as needed) → **Workflow Planning** (always) → **Code Generation** (always, per-unit) → **Build and Test** (always)
+• **Workspace Detection** (always; includes cycle start when the memory extension is on) → **Reverse Engineering** (brownfield only; skip, delta, or full when memory is on) → **Requirements Analysis** (always, adaptive depth) → **Conditional Phases** (as needed) → **Workflow Planning** (always) → **Code Generation** (always, per-unit) → **Build and Test** (always) → **Cycle Close** (only when the memory extension is on)
 
 ## How It Works:
 • **AI analyzes** your request, workspace, and complexity to determine which stages are needed
@@ -51,6 +51,7 @@ flowchart TD
         ID["Infrastructure Design<br/><b>CONDITIONAL</b>"]
         CG["Code Generation<br/><b>ALWAYS</b>"]
         BT["Build and Test<br/><b>ALWAYS</b>"]
+        CC["Cycle Close<br/><b>CONDITIONAL</b>"]
     end
     
     subgraph OPERATIONS["🟡 OPERATIONS PHASE"]
@@ -81,7 +82,8 @@ flowchart TD
     ID --> CG
     CG -.->|Next Unit| FD
     CG --> BT
-    BT -.-> OPS
+    BT -.-> CC
+    CC -.-> OPS
     BT --> End(["Complete"])
     
     style WD fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#fff
@@ -100,6 +102,7 @@ flowchart TD
     style NFRA fill:#FFA726,stroke:#E65100,stroke-width:3px,stroke-dasharray: 5 5,color:#000
     style NFRD fill:#FFA726,stroke:#E65100,stroke-width:3px,stroke-dasharray: 5 5,color:#000
     style ID fill:#FFA726,stroke:#E65100,stroke-width:3px,stroke-dasharray: 5 5,color:#000
+    style CC fill:#FFA726,stroke:#E65100,stroke-width:3px,stroke-dasharray: 5 5,color:#000
     style INCEPTION fill:#BBDEFB,stroke:#1565C0,stroke-width:3px, color:#000
     style CONSTRUCTION fill:#C8E6C9,stroke:#2E7D32,stroke-width:3px, color:#000
     style OPERATIONS fill:#FFF59D,stroke:#F57F17,stroke-width:3px, color:#000
@@ -127,6 +130,7 @@ flowchart TD
 - Infrastructure Design: Map to actual infrastructure services (CONDITIONAL, per-unit)
 - Code Generation: Generate code with Part 1 - Planning, Part 2 - Generation (ALWAYS, per-unit)
 - Build and Test: Build all units and execute comprehensive testing (ALWAYS)
+- Cycle Close: Archive changes, refresh the code knowledge base, and write the handoff (CONDITIONAL - only when the memory extension is on)
 
 **🟡 OPERATIONS PHASE** - Placeholder
 - Operations: Placeholder for future deployment and monitoring workflows (PLACEHOLDER)

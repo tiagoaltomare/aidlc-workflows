@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tiagoaltomare/aidlc-workflows/blob/v1/aidlc-rules/aws-aidlc-rule-details/extensions/memory/okf-frontmatter.schema.json",
+  "title": "AI-DLC memory concept frontmatter (OKF v0.2 profile)",
+  "description": "OKF v0.2 concept frontmatter plus the AI-DLC memory extensions. The profile is version-independent: it does not name an AI-DLC product version. Unknown keys are allowed and must be preserved. type is the only OKF-required field. CodeKB entries SHOULD carry source_commit, covers, and sources with path and sha256 once stamped.",
+  "type": "object",
+  "required": ["type"],
+  "additionalProperties": true,
+  "properties": {
+    "type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "OKF concept type. AI-DLC memory uses CodeKB Entry, Handoff, ADR, Spec, Change Proposal, and Change Tasks."
+    },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "resource": { "type": "string" },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "stable", "deprecated"]
+    },
+    "okf_version": {
+      "type": "string",
+      "const": "0.2",
+      "description": "Permitted on the bundle-root index.md. Concept files normally omit it."
+    },
+    "generated": { "$ref": "#/$defs/actorEvent" },
+    "verified": {
+      "description": "One actor event, or a list of them. A human approval uses the human: prefix.",
+      "oneOf": [
+        { "$ref": "#/$defs/actorEvent" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/actorEvent" }
+        }
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "source_commit": {
+      "type": "string",
+      "description": "Full git commit recorded by stamp. The literal unversioned means the workspace had no git repository."
+    },
+    "covers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Workspace-relative paths, directory prefixes ending in /, or globs this entry is responsible for."
+    },
+    "derived_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "AI-DLC extension. OKF v0.2 does not define this key; consumers must preserve it."
+    },
+    "aggregate": {
+      "type": "boolean",
+      "description": "When true, the entry itself is stale only if more than aggregate_ratio of its sources diverge or a source is missing."
+    },
+    "re_mode": {
+      "type": "string",
+      "enum": ["skip", "delta", "full"],
+      "description": "Recorded on a handoff. The last approved handoffs drive the delta streak."
+    }
+  },
+  "$defs": {
+    "actorEvent": {
+      "type": "object",
+      "required": ["by"],
+      "additionalProperties": true,
+      "properties": {
+        "by": {
+          "type": "string",
+          "description": "Actor. Human approvals start with human:. Agents use agent:<name>. Processes use process:<name>."
+        },
+        "at": {
+          "type": "string",
+          "description": "ISO 8601 datetime with an explicit UTC offset, for example 2026-10-22T17:00:00Z."
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["resource"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "resource": {
+          "type": "string",
+          "description": "OKF required. For code, the workspace-relative path using forward slashes."
+        },
+        "path": {
+          "type": "string",
+          "description": "AI-DLC extension. Workspace-relative path the checker hashes. Defaults to resource when resource is a relative path."
+        },
+        "title": { "type": "string" },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Lowercase hex SHA-256 of the file contents after newline normalization to LF."
+        }
+      }
+    }
+  }
+}

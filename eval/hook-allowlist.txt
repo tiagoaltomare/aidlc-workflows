@@ -1,0 +1,14 @@
+aidlc-rules/aws-aidlc-rules/core-workflow.md
+aidlc-rules/aws-aidlc-rule-details/common/process-overview.md
+aidlc-rules/aws-aidlc-rule-details/common/session-continuity.md
+aidlc-rules/aws-aidlc-rule-details/common/terminology.md
+aidlc-rules/aws-aidlc-rule-details/construction/build-and-test.md
+aidlc-rules/aws-aidlc-rule-details/inception/requirements-analysis.md
+aidlc-rules/aws-aidlc-rule-details/inception/reverse-engineering.md
+aidlc-rules/aws-aidlc-rule-details/inception/units-generation.md
+aidlc-rules/aws-aidlc-rule-details/inception/workflow-planning.md
+aidlc-rules/aws-aidlc-rule-details/inception/workspace-detection.md
+aidlc-rules/VERSION
+CHANGELOG.md
+README.md
+docs/GENERATED_DOCS_REFERENCE.md

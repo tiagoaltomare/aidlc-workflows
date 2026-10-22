@@ -158,6 +158,7 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 - Mark Units Generation stage complete in `aidlc-docs/aidlc-state.md`
 - Update the "Current Status" section
 - Prepare for transition to CONSTRUCTION PHASE
+- **Memory extension on**: Under each unit in `aidlc-docs/aidlc-state.md`, record `Change: <change-id>` from the execution plan. One unit may name a different change id only when the plan split the intent. Do not copy spec text into the unit record. **Memory extension off**: do not add a change id.
 
 ---
 
