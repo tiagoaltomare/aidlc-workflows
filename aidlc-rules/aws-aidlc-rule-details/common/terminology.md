@@ -15,7 +15,7 @@
 - Stages can be ALWAYS-EXECUTE or CONDITIONAL
 
 **Usage Examples**:
-- ✅ "The CONSTRUCTION phase contains 7 stages"
+- ✅ "The CONSTRUCTION phase contains 7 stages, plus Cycle Close when the memory extension is on"
 - ✅ "The Code Generation stage is always executed"
 - ✅ "We're in the INCEPTION phase, executing the Requirements Assessment stage"
 - ❌ "The Requirements Assessment phase" (should be "stage")
@@ -51,6 +51,7 @@
 - Infrastructure Design (CONDITIONAL, per-unit)
 - Code Generation (ALWAYS) — includes Part 1: Planning and Part 2: Generation
 - Build and Test (ALWAYS)
+- Cycle Close (CONDITIONAL - only when the memory extension is on)
 
 **Outputs**: Design artifacts, NFR implementations, code, tests
 
@@ -74,6 +75,7 @@
 - **Workflow Planning**: Creating execution plan for which phases to run
 - **Code Generation**: Single stage with two parts — Part 1 (Planning) creates detailed implementation plans, Part 2 (Generation) generates actual code based on plans and prior artifacts
 - **Build and Test**: Building all units and executing comprehensive testing
+- **Cycle Close**: Archive approved OpenSpec changes, refresh the code knowledge base, and write the handoff. Runs only when the memory extension is on.
 
 ### Conditional Stages
 - **Reverse Engineering**: Analyzing existing codebase (brownfield projects only)
@@ -181,6 +183,11 @@ Files tracking workflow progress and status.
 ## Common Abbreviations
 
 - **AI-DLC**: AI-Driven Development Life Cycle
+- **Cycle**: One pass from Workspace Detection through Cycle Close. The next cycle starts from the approved handoff. Defined only when the memory extension is on. See `extensions/memory/memory-spec.md`.
+- **Handoff**: The fixed record at the end of a cycle (`Escopo`, `Changes`, `Stale`, `Dívidas`, `Pendências`, `Commit`). A cycle is closed only after a human verifies it.
+- **CodeKB**: The code knowledge base under `aidlc-docs/knowledge/code/`. Each entry names the source files it covers and stores a SHA-256 written by `aidlc_memory.py`, not by the model.
+- **Stale**: A source file whose LF-normalized SHA-256 no longer matches the codekb, or a code file no entry covers.
+- **OKF**: Open Knowledge Format v0.2, the frontmatter profile used by the memory bundle. `type` is required. `verified` records who approved a concept.
 - **NFR**: Non-Functional Requirements
 - **UOW**: Unit of Work
 - **API**: Application Programming Interface
