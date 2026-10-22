@@ -27,6 +27,7 @@ AI-DLC is an intelligent software development workflow that adapts to your needs
 ## Table of Contents
 
 - [Common](#common)
+- [Memory between cycles (opt-in)](#memory-between-cycles-opt-in)
 - [Platform-Specific Setup](#platform-specific-setup)
 - [Usage](#usage)
 - [Three-Phase Adaptive Workflow](#three-phase-adaptive-workflow)
@@ -47,11 +48,41 @@ AI-DLC is an intelligent software development workflow that adapts to your needs
 
 ## Common
 
-1. Download the latest release zip file named `ai-dlc-rules-v<release-number>.zip` from the [Releases page](https://github.com/awslabs/aidlc-workflows/releases/latest) to a folder **outside** your project directory (e.g., `~/Downloads`).
-2. Extract the zip. It contains an `aidlc-rules/` folder with two subdirectories:
+1. Download the latest release zip file named `ai-dlc-rules-v<release-number>.zip` from the [Releases page](https://github.com/tiagoaltomare/aidlc-workflows/releases/latest) to a folder **outside** your project directory (e.g., `~/Downloads`).
+2. Extract the zip. It contains an `aidlc-rules/` folder with:
    - `aws-aidlc-rules/` — the core AI-DLC workflow rules
    - `aws-aidlc-rule-details/` — detailed rules conditionally referenced by the core rules
+   - `tools/aidlc_memory.py` — optional memory check. Python 3 standard library only. The workflow calls it only after you opt in.
 3. Follow the setup instructions for your coding agent and platform below.
+
+## Memory between cycles (opt-in)
+
+Releases from this fork can carry memory between cycles: a code knowledge base, a handoff, and OpenSpec changes under `aidlc-docs/`. Installation does not create those directories. The extension stays off until you add `aidlc-docs/knowledge/.aidlc-memory` (copy `templates/aidlc-memory.json` from the rule details). The first opted-in cycle creates `aidlc-docs/knowledge/` and `aidlc-docs/openspec/`. With the marker absent, the workflow behaves as it does without the extension.
+
+AI-assisted setup copies the whole `aidlc-rules/` tree, so the script is `.aidlc/aidlc-rules/tools/aidlc_memory.py`. Manual setup copies the rule folders only. Copy the script once after those steps:
+
+On macOS/Linux:
+
+```bash
+mkdir -p .aidlc/tools
+cp ~/Downloads/aidlc-rules/tools/aidlc_memory.py .aidlc/tools/
+```
+
+On Windows (PowerShell):
+
+```powershell
+New-Item -ItemType Directory -Force -Path ".aidlc\tools"
+Copy-Item "$env:USERPROFILE\Downloads\aidlc-rules\tools\aidlc_memory.py" ".aidlc\tools\"
+```
+
+On Windows (CMD):
+
+```cmd
+mkdir .aidlc\tools
+copy %USERPROFILE%\Downloads\aidlc-rules\tools\aidlc_memory.py .aidlc\tools\
+```
+
+No extra packages. If Python is missing, the memory rules describe the same check with `git diff` and `sha256sum`.
 
 ---
 
@@ -931,7 +962,7 @@ Set up AI-DLC in this project by doing the following:
 
 1. Download the latest AI-DLC release:
    - Use the GitHub API to find the latest release asset URL:
-     curl -sL https://api.github.com/repos/awslabs/aidlc-workflows/releases/latest \
+     curl -sL https://api.github.com/repos/tiagoaltomare/aidlc-workflows/releases/latest \
        | grep -o '"browser_download_url": *"[^"]*"' \
        | head -1 \
        | cut -d'"' -f4
@@ -963,6 +994,10 @@ Set up AI-DLC in this project by doing the following:
 4. Add `.aidlc` to `.gitignore` unless I explicitly ask you not to.
 
 5. Confirm what file you created and that `.aidlc` is gitignored.
+
+6. The memory script is already at `.aidlc/aidlc-rules/tools/aidlc_memory.py`.
+   Do not create `aidlc-docs/knowledge/` or `aidlc-docs/openspec/` unless I
+   ask to turn memory on.
 ```
 
 The agent will download the latest release, create the correct config file for your IDE, and gitignore the `.aidlc` directory automatically.
