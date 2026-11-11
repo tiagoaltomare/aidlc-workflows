@@ -186,6 +186,36 @@ Create `aidlc-docs/inception/reverse-engineering/component-inventory.md`:
 - **Test**: [Number]
 ```
 
+## Step 6b: Generate Interaction Diagrams
+
+Create `aidlc-docs/inception/reverse-engineering/interaction-diagrams.md`.
+This is the dedicated artifact for the core-workflow deliverable "Generate
+Interaction Diagrams". Also include the same diagrams (or a pointer) in
+`architecture.md`. Do not leave this unnamed.
+
+```markdown
+# Interaction Diagrams
+
+How business transactions are implemented across components.
+
+## [Transaction name]
+
+Sequence or collaboration (Mermaid or ASCII):
+
+    participant User
+    participant API
+    participant Service
+    participant Store
+
+    User -> API: request
+    API -> Service: handle
+    Service -> Store: read/write
+```
+
+Cover every business transaction listed in `business-overview.md`. If a
+transaction cannot be traced, say so with low confidence — do not invent
+calls.
+
 ## Step 7: Generate Technology Stack Documentation
 
 Create `aidlc-docs/inception/reverse-engineering/technology-stack.md`:
@@ -272,6 +302,7 @@ Create `aidlc-docs/inception/reverse-engineering/reverse-engineering-timestamp.m
 - [x] code-structure.md
 - [x] api-documentation.md
 - [x] component-inventory.md
+- [x] interaction-diagrams.md
 - [x] technology-stack.md
 - [x] dependencies.md
 - [x] code-quality-assessment.md

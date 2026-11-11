@@ -36,7 +36,9 @@ A retrofit or a later cycle MUST NOT delete a versioned Vision.
 
 ## Greenfield
 
-Generate a **complete** Vision (not a minimal "start fast" sketch). Use the
+Generate a **complete** Vision at every `depth` (including `minimal`).
+`depth: minimal` means shorter prose per required section, not omitted
+sections. Do not produce a "start fast" sketch. Use the
 structure in `docs/writing-inputs/vision-document-guide.md`:
 
 1. Executive Summary
@@ -60,6 +62,11 @@ Generate (or reuse) Vision **from the approved Reverse Engineering artifacts**:
 
 Do not invent a product story that the codebase does not support. Uncertain
 features get low confidence in the catalog and are listed at `vision_scope`.
+
+Cycle-requested capabilities that are **not in the codebase yet** go to
+`vision-change-proposals.md` **and** the catalog as `FEAT-` rows with
+confidence `medium` or `low`. They are not current-state. After
+`vision_scope`, those proposed ids may be in-scope for this cycle.
 
 ## Change proposals
 

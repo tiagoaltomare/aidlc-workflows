@@ -116,19 +116,7 @@ Using the rule × component matrix from Step 2, generate the NFR requirements pl
      3. **Formatted Workflow Message** (mandatory): Always end with this exact format:
 
 ```markdown
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the NFR requirements at: `aidlc-docs/construction/[unit-name]/nfr-requirements/`
-
-
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Ask for modifications to the NFR requirements based on your review  
-> ✅ **Continue to Next Stage** - Approve NFR requirements and proceed to **[next-stage-name]**
-
----
+**Stage complete (no gate).** Artifacts: `aidlc-docs/construction/[unit-name]/nfr-requirements/`. Continue. Review is at `design_validation` (if triggered) or `build_and_test`. Do not wait for per-stage approval.
 ```
 
 ### Step 9: No stage gate

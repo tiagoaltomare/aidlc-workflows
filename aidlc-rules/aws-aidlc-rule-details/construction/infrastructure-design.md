@@ -77,19 +77,7 @@ Map logical software components to actual infrastructure choices for deployment 
      3. **Formatted Workflow Message** (mandatory): Always end with this exact format:
 
 ```markdown
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the infrastructure design at: `aidlc-docs/construction/[unit-name]/infrastructure-design/`
-
-
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Ask for modifications to the infrastructure design based on your review  
-> ✅ **Continue to Next Stage** - Approve infrastructure design
-
----
+**Stage complete (no gate).** Artifacts: `aidlc-docs/construction/[unit-name]/infrastructure-design/`. Continue. Review is at `design_validation` (if triggered) or `build_and_test`. Do not wait for per-stage approval.
 ```
 
 ### Step 8: No stage gate
@@ -211,20 +199,7 @@ B) Select specific journeys: [list numbers]
      3. **Formatted Workflow Message** (mandatory): Always end with this exact format:
 
 ```markdown
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please verify the resource inventory is complete — every AWS resource in your infrastructure should appear above.
-> Full rule mapping: `aidlc-docs/construction/plans/[unit-name]-extension-plan-rule-mapping.md`
-
-
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Request additions or corrections to the resource inventory or rule mapping  
-> ✅ **Continue to Next Stage** - Approve rule mapping and proceed to **Code Generation**
-
----
+**Stage complete (no gate).** Rule mapping: `aidlc-docs/construction/plans/[unit-name]-extension-plan-rule-mapping.md`. Continue to Design Validation. Do not wait here.
 ```
 
 ### Step 17: No mapping gate

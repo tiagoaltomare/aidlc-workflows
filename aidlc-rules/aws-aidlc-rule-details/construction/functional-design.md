@@ -95,19 +95,7 @@ Design detailed business logic for the unit, technology-agnostic and focused pur
      3. **Formatted Workflow Message** (mandatory): Always end with this exact format:
 
 ```markdown
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the functional design artifacts at: `aidlc-docs/construction/[unit-name]/functional-design/`
-
-
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Ask for modifications to the functional design based on your review  
-> ✅ **Continue to Next Stage** - Approve functional design and proceed to **[next-stage-name]**
-
----
+**Stage complete (no gate).** Artifacts: `aidlc-docs/construction/[unit-name]/functional-design/`. Continue. Review is at `design_validation` (if triggered) or `build_and_test`. Do not wait for per-stage approval.
 ```
 
 ### Step 8: No stage gate

@@ -14,8 +14,9 @@ User Stories focus on:
 
 ## Prerequisites
 - Workspace Detection must be complete
+- Create Vision / Tech Env / catalog / scopes must be complete (`vision_scope` approved)
 - Requirements Analysis recommended (can reference requirements if available)
-- Workflow Planning must indicate User Stories stage should execute
+- This stage runs **before** Workflow Planning (`core-workflow.md`). Do not wait for the execution plan to "indicate" User Stories. Decide with the intelligent assessment in this file; Workflow Planning records the decision.
 
 ## Intelligent Assessment Guidelines
 
@@ -272,23 +273,11 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
      3. **Formatted Workflow Message** (mandatory): Always end with this exact format:
 
 ```markdown
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the user stories and personas at: `aidlc-docs/inception/user-stories/stories.md` and `aidlc-docs/inception/user-stories/personas.md`
-
-
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** -  Ask for modifications to the stories or personas based on your review  
-> (Informational only — do not wait.) Continue to **Workflow Planning**. Review is at `inception_end`.
-
----
+**Stage complete (no gate).** Artifacts: `aidlc-docs/inception/user-stories/stories.md` and `personas.md`. Continue to **Workflow Planning**. Review is at `inception_end`. Do not wait for per-stage approval.
 ```
 
 ## Step 21: No stories gate
-- Run `python -m aidlc_validate stories --root PRODUCT_REPO`. Do not wait for a person. Continue.
+- Run `python3 -m aidlc_validate stories --root PRODUCT_REPO`. Do not wait for a person. Continue.
 
 ## Step 22: Record Approval Response
 - Log the user's approval response with timestamp in `aidlc-docs/audit.md`
@@ -308,7 +297,7 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 - **CONTEXT-APPROPRIATE QUESTIONS**: Only ask questions relevant to this specific context
 - **MANDATORY ANSWER ANALYSIS**: Always analyze answers for ambiguities before proceeding
 - **NO PROCEEDING WITH AMBIGUITY**: Must resolve all vague answers before generation
-- **EXPLICIT APPROVAL REQUIRED**: User must approve plan before generation starts
+- **NO PLAN GATE**: There is no per-stage approval. Non-blocking answers go to `assumptions.md`. Continue. Review is at `inception_end`.
 
 ## Generation Phase Rules
 - **NO HARDCODED LOGIC**: Only execute what's written in the story generation plan
@@ -318,9 +307,8 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 - **VERIFY COMPLETION**: Ensure all story artifacts are complete before proceeding
 
 ## Completion Criteria
-- All planning questions answered and ambiguities resolved
-- Story plan explicitly approved by user
+- All planning questions answered (blocking) or copied to `assumptions.md` (non-blocking)
 - All steps in story generation plan marked [x]
 - All story artifacts generated according to plan (stories.md, personas.md)
-- Generated stories explicitly approved by user
-- Stories verified and ready for next stage
+- Validator `stories` and `traceability` run
+- Ready for Workflow Planning; human review is at `inception_end`

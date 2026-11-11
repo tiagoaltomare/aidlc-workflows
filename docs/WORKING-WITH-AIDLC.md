@@ -46,7 +46,9 @@ These patterns let you think out loud with the AI, evaluate options, and challen
 
 ### The Question → Doc → Approval Flow
 
-AIDLC never asks clarifying questions inline in the chat. It writes questions into a markdown file and waits for you to fill in your answers there. This keeps a durable record of every decision and makes it easy for the whole team to contribute.
+AIDLC never asks **non-gate** clarifying questions only in the chat. It writes questions into a markdown file. On this autonomous fork, **named gates** may also appear in the assistant turn, and **non-blocking** questions are copied to `aidlc-docs/assumptions.md` so the run can continue. Blocking questions and named gates still wait. This keeps a durable record of every decision and makes it easy for the whole team to contribute.
+
+See [Getting started (autonomous fork)](aidlc-autonomo/getting-started.md).
 
 **Step 1 — AIDLC creates a question file**
 

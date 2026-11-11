@@ -1,6 +1,8 @@
 # Validation — Rule Compliance and Documentation
 
-> **OVERRIDE**: ALL steps in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. Every step MUST be executed. The model MUST read actual source files and IaC files in workspace/ for every applicable rule. The model MUST NOT verify from memory of what was generated or by checking that design documents exist. Every verification criterion in every applicable rule MUST be individually checked against the actual code.
+**OVERRIDE:** When this stage **runs**, ALL steps in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. Every step MUST be executed. The model MUST read actual source files and IaC files in workspace/ for every applicable rule. The model MUST NOT verify from memory of what was generated or by checking that design documents exist. Every verification criterion in every applicable rule MUST be individually checked against the actual code.
+
+**Skip still applies.** `core-workflow.md` Skip IF (no operational extensions opted IN) is not overridden. After Step 1, if no domain is opted IN (Enabled=No, or that prompt's skip/No option — B, C, or D), mark Rules Validation SKIPPED, log it, and stop. Do not invent per-domain reports. This OVERRIDE does not force the stage to run when nothing was opted IN.
 
 **Purpose**: Systematically verify that Construction correctly implemented all applicable operational rules, and produce comprehensive documentation of what was built, how it is configured, and why.
 

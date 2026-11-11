@@ -18,9 +18,10 @@ Adaptive depth MUST NOT be applied to blocking rules. All extension rules are bl
 - **If SKIP**: Stage doesn't run at all
 
 ### Detail Level (Adaptive)
-- **Simple problems**: Concise artifacts with essential detail
-- **Complex problems**: Comprehensive artifacts with extensive detail
-- **Model decides**: Based on problem characteristics, not prescriptive rules
+- **Simple problems** / `depth: minimal`: Concise artifacts with essential detail
+- **Complex problems** / `depth: comprehensive`: Extensive detail
+- **Model decides**: Based on problem characteristics and `aidlc.config.yaml` `depth`, not by dropping sections
+- **Vision is depth-aware, not section-optional**: at `minimal`, every required Vision section still exists; the prose is shorter. Same for Tech Env, catalog, and scopes.
 
 ## Factors Influencing Detail Level
 

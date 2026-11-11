@@ -266,11 +266,77 @@ def _section_ids(text: str, heading: str, kind: str) -> list[str]:
     return _ids(kind, "\n".join(chunk))
 
 
+CANONICAL_SCOPE_NAME = re.compile(r"^scope-\d+\.md$")
+MDX_IDENT_RE = re.compile(r"(?<!\\)\{([A-Za-z_][A-Za-z0-9_]*)")
+FENCE_RE = re.compile(r"```.*?```", re.S)
+INLINE_CODE_RE = re.compile(r"`[^`]+`")
+
+
+def _current_scope_path(root: Path) -> Path | None:
+    """`scope.current_path` from aidlc.config.yaml when that file exists."""
+    path = root / "aidlc.config.yaml"
+    if not path.is_file():
+        return None
+    try:
+        data = yaml.safe_load(_read(path))
+    except yaml.YAMLError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    current = (data.get("scope") or {}).get("current_path")
+    if not current:
+        return None
+    extra = root / current
+    return extra if extra.is_file() else None
+
+
 def _scope_files(root: Path) -> list[Path]:
+    """Current-cycle scope files.
+
+    Prefer `scope.current_path`. Also collect `scope-*.md`. Files that share
+    a SCOPE- id are one set (canonical `scope-<digits>.md` wins over an
+    alias such as `scope-atual.md`). When current_path is set, other
+    SCOPE- ids are historical and are not extra in-scope sets.
+    """
     directory = root / SCOPES_DIR
-    if not directory.is_dir():
-        return []
-    return sorted(directory.glob("scope-*.md"))
+    current = _current_scope_path(root)
+    candidates: list[Path] = []
+    if current is not None:
+        candidates.append(current.resolve())
+    if directory.is_dir():
+        for path in sorted(directory.glob("scope-*.md")):
+            resolved = path.resolve()
+            if resolved not in candidates:
+                candidates.append(resolved)
+
+    current_id: str | None = None
+    if current is not None:
+        ids = _ids("SCOPE", _read(current))
+        current_id = ids[0] if ids else None
+
+    def sort_key(path: Path) -> tuple[int, int, str]:
+        canonical = 0 if CANONICAL_SCOPE_NAME.match(path.name) else 1
+        current_first = 0 if current is not None and path == current.resolve() else 1
+        return (canonical, current_first, path.name)
+
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for path in sorted(candidates, key=sort_key):
+        ids = _ids("SCOPE", _read(path))
+        if current_id is not None and ids and ids[0] != current_id:
+            continue
+        key = ids[0] if ids else str(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(path)
+    return unique
+
+
+def _mdx_unescaped_idents(text: str) -> list[str]:
+    stripped = FENCE_RE.sub("", text)
+    stripped = INLINE_CODE_RE.sub("", stripped)
+    return MDX_IDENT_RE.findall(stripped)
 
 
 def _covers_map(text: str, item_kind: str, covers_kind: str) -> dict[str, set[str]]:
@@ -349,6 +415,11 @@ def check_traceability(root: Path) -> list[str]:
 
     stories_file = root / STORIES_PATH
     stories_exist = stories_file.is_file()
+    if stories_exist and not _declared_units(root):
+        errors.append(
+            "traceability: stories exist but no UNIT record was produced; "
+            "Units Generation must create at least one unit"
+        )
     story_ids: list[str] = []
     story_covers: dict[str, set[str]] = {}
     if stories_exist:
@@ -456,6 +527,15 @@ def check_export(root: Path) -> list[str]:
             ]
             if hits:
                 errors.append("export: excluded raw plans present: " + ", ".join(hits))
+
+    for md in sorted(site.rglob("*.md")):
+        idents = _mdx_unescaped_idents(_read(md))
+        if idents:
+            rel = md.relative_to(root)
+            errors.append(
+                f"export: unescaped MDX identifier {idents[0]!r} in {rel} "
+                r"(escape braces like \{id\} or wrap in backticks)"
+            )
     return errors
 
 

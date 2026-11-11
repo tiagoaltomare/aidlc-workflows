@@ -4,8 +4,10 @@ Deterministic checks for a product repository that follows the AI-DLC
 autonomous fork. Stdlib plus PyYAML and jsonschema.
 
 ```bash
-python -m aidlc_validate CHECK --root PRODUCT_REPO
+python3 -m aidlc_validate CHECK --root PRODUCT_REPO
 ```
+
+Use **`python3`**. Do not assume a `python` command exists.
 
 `CHECK` is one of: `config`, `units-dag`, `traceability`, `scope-in-vision`,
 `export`, `stories`. Non-zero exit prints the failures to stderr.
@@ -15,14 +17,14 @@ Install from this directory (`pip install -e .`) or set `PYTHONPATH` to
 
 ## Artifact paths
 
-| Check             | Reads                                                                                                                                    |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`          | `aidlc.config.yaml`                                                                                                                      |
-| `units-dag`       | `aidlc-docs/inception/application-design/unit-of-work.md`, `unit-of-work-dependency.md`                                                  |
-| `traceability`    | `aidlc-docs/vision/scopes/scope-*.md`, `inception/requirements/requirements.md`, `user-stories/stories.md`, `unit-of-work-story-map.md`  |
-| `scope-in-vision` | `aidlc-docs/vision/features.md`, `aidlc-docs/vision/scopes/scope-*.md`                                                                   |
-| `export`          | `aidlc.config.yaml` `operations.include` / `exclude`, docs-site folder (`operations.docusaurus_path`, default `docs-site`)               |
-| `stories`         | `aidlc-docs/inception/user-stories/stories.md` plus `stories.*` in the config (As a / I want, min/max AC)                                |
+| Check             | Reads                                                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config`          | `aidlc.config.yaml`                                                                                                                                                               |
+| `units-dag`       | `aidlc-docs/inception/application-design/unit-of-work.md`, `unit-of-work-dependency.md`                                                                                           |
+| `traceability`    | Current-cycle scope (`scope.current_path`, else `scope-*.md`), `inception/requirements/requirements.md`, `user-stories/stories.md`, `unit-of-work-story-map.md`                   |
+| `scope-in-vision` | `aidlc-docs/vision/features.md`, current-cycle scope (`scope.current_path`, else `scope-*.md`; alias files with the same `SCOPE-` id count once)                                  |
+| `export`          | `aidlc.config.yaml` `operations.include` / `exclude`, docs-site folder (`operations.docusaurus_path`, default `docs-site`); unescaped `{ident}` in exported markdown is a failure |
+| `stories`         | `aidlc-docs/inception/user-stories/stories.md` plus `stories.*` in the config (As a / I want, min/max AC)                                                                         |
 
 ## ID conventions
 
@@ -76,10 +78,10 @@ One `UNIT-` id per `unit` cell. Dependencies are comma-separated `UNIT-` ids.
 Empty, `None`, `-`, or `n/a` means no dependency.
 
 ```markdown
-| unit      | depends_on |
-| --------- | ---------- |
-| UNIT-001  |            |
-| UNIT-002  | UNIT-001   |
+| unit     | depends_on |
+| -------- | ---------- |
+| UNIT-001 |            |
+| UNIT-002 | UNIT-001   |
 ```
 
 `units-dag` fails on a cycle or on a `UNIT-` id that is not declared in
@@ -98,9 +100,9 @@ story. Out-of-scope ids must not appear in `aidlc-docs/inception/`,
 Story map table:
 
 ```markdown
-| story   | unit     |
-| ------- | -------- |
-| US-001  | UNIT-001 |
+| story  | unit     |
+| ------ | -------- |
+| US-001 | UNIT-001 |
 ```
 
 ## Export markers

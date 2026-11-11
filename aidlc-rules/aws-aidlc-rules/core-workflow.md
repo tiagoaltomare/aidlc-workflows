@@ -28,24 +28,31 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 - Load `common/config.md` and apply `aidlc.config.yaml` (validate before use; refuse and stop on invalid or unknown schema_version)
 - Load `common/assumptions.md` for blocking vs non-blocking questions
 - Load `common/automatic-checks.md` and `common/inception-autonomy.md`
+- Load `common/agents-md.md` (preserve/merge `AGENTS.md` when a scaffold would overwrite it)
 - Reference these throughout the workflow execution
 
 ## MANDATORY: Extensions Loading
-**CRITICAL**: At workflow start, scan the `extensions/` directory recursively for all `.md` files. These are extension rule files that apply as cross-cutting constraints across the entire workflow.
+**CRITICAL**: Extensions are opt-in. At workflow start, **do not** load or enforce every extension `.md` file.
 
 **Loading process**:
-1. List all subdirectories under `extensions/` (e.g., `extensions/security/`, `extensions/compliance/`)
-2. Load every `.md` file found within those subdirectories
-3. Each extension file defines its own verification criteria and enforcement rules as cross-cutting constraints
+1. List all subdirectories under `extensions/` (e.g., `extensions/security/`, `extensions/observability/`)
+2. At workflow start, load **only** `*.opt-in.md` files. The opt-in heading is `## Opt-In Prompt` (preferred) or `## Question`. There is no `## Applicability Question` heading.
+3. After Requirements Analysis records `## Extension Configuration` in `aidlc-docs/aidlc-state.md`, load the remaining rule files **only** for extensions the person opted IN, using each opt-in file's Loading Instructions.
 
 **Enforcement**:
-- Extension rules are hard constraints, not optional guidance
-- Unless an extension defines a Stage Enforcement section, at each stage the model intelligently evaluates which extension rules are applicable based on the stage's purpose, the artifacts being produced, and the context of the work — enforce only those rules that are relevant. Where an extension defines a Stage Enforcement section, the stages listed are mandatory inclusions — the model MUST enforce the rules at those stages and MAY also enforce them at other stages where relevant.
+- Extension rules are hard constraints **after** they are opted IN
+- Unless an extension defines a Stage Enforcement section, at each stage the model intelligently evaluates which opted-in rules apply — enforce only those that are relevant. Where an extension defines a Stage Enforcement section, the stages listed are mandatory inclusions.
 - If a rule is judged as not applicable after intelligent evaluation, it must be marked N/A with documented rationale in the compliance summary — this is not a blocking finding.
 - Non-compliance with any applicable enabled extension rule is a **blocking finding** — do NOT present stage completion until resolved
 - When presenting stage completion, include a summary of extension rule compliance (compliant/non-compliant/N/A per rule, with brief rationale for N/A determinations)
 
-**Conditional Enforcement**: Extensions may be conditionally enabled/disabled. See `inception/requirements-analysis.md` for the collection mechanism. Before enforcing any extension at ANY stage, check its `Enabled` status in `aidlc-docs/aidlc-state.md` under `## Extension Configuration`. Skip disabled extensions and log the skip in audit.md. Default to enforced if no configuration exists. Extensions without an `## Applicability Question` are always enforced.
+**Conditional Enforcement**: See `inception/requirements-analysis.md`. Before enforcing any extension at ANY stage, check its `Enabled` status in `aidlc-docs/aidlc-state.md` under `## Extension Configuration`. Skip disabled extensions and log the skip in audit.md.
+
+Until Extension Configuration exists, do **not** default to enforced. Conservative default is "not yet opted in". Opt-in at Requirements Analysis is blocking.
+
+**Opted IN / opted OUT** is independent of letter scale. Prompts may be A/B, A/B/C, or A/B/C/D. **Opted OUT** means Enabled=No, or the skip/No option that prompt offers (B, C, or D — whichever letter is the decline). **Opted IN** means Enabled=Yes / Always Enforced, or any non-skip answer.
+
+Extensions with no `## Opt-In Prompt` and no `## Question` and not named `*.opt-in.md` are always enforced **after** RA has recorded configuration. Until then, list them; do not treat them as opted IN.
 
 ## MANDATORY: Content Validation
 **CRITICAL**: Before creating ANY file, you MUST validate content according to `common/content-validation.md` rules:
@@ -177,7 +184,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Generate code structure documentation
    - Generate API documentation
    - Generate component inventory
-   - Generate Interaction Diagrams depicting how business transactions are implemented across components
+   - Generate Interaction Diagrams depicting how business transactions are implemented across components (`aidlc-docs/inception/reverse-engineering/interaction-diagrams.md`; see reverse-engineering.md)
    - Generate technology stack documentation
    - Generate dependencies documentation
 5. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
@@ -199,7 +206,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 1. **MANDATORY**: You MUST log start of this composite stage in audit.md
 2. Load `common/config.md` values already applied at workflow start (`vision.reuse_policy`, paths)
 3. Run the four parts. Honor reuse: do not regenerate versioned Vision/Tech Env from scratch when `reuse_if_present` and the files exist under `aidlc-docs/vision/`
-4. Run `python -m aidlc_validate scope-in-vision --root PRODUCT_REPO` (blocking)
+4. Run `python3 -m aidlc_validate scope-in-vision --root PRODUCT_REPO` (blocking)
 5. Seed `aidlc-docs/assumptions.md` if it does not exist
 6. **Wait for Explicit Approval** (gate `vision_scope`): present Vision, Tech Env, catalog, scopes (in/out), low-confidence features, change proposals, and assumptions. DO NOT start Requirements Analysis until the person approves
 7. **MANDATORY**: You MUST log the person's response in audit.md with complete raw input
@@ -294,7 +301,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 8. **PART 1 - Planning**: Create the story plan from config; non-blocking questions → `assumptions.md`
 9. **PART 2 - Generation**: Generate stories and personas
 10. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-11. **No stage gate.** Run `python -m aidlc_validate stories --root PRODUCT_REPO` and `traceability`. Continue. Human review is at `inception_end`.
+11. **No stage gate.** Run `python3 -m aidlc_validate stories --root PRODUCT_REPO` and `traceability`. Continue. Human review is at `inception_end`.
 
 ## Workflow Planning (ALWAYS EXECUTE)
 
@@ -308,7 +315,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Requirements (if executed)
    - User stories (if executed)
 6. Execute workflow planning:
-   - Determine which phases to execute (Inception, Construction, AND Operations — see workflow-planning.md Step 3.5 for Operations determination)
+   - Determine which phases to execute (Inception, Construction, AND Operations — see workflow-planning.md Step 3.6 for Operations determination; Step 3.5 is Infrastructure Design)
    - Determine depth level for each phase
    - Create multi-package change sequence (if brownfield)
    - Generate workflow visualization (VALIDATE Mermaid syntax before writing)
@@ -340,15 +347,20 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 
 ## Units Generation (CONDITIONAL)
 
+When User Stories ran, this stage **must** produce at least one `UNIT-`
+record, `unit-of-work.md`, an acyclic DAG in `unit-of-work-dependency.md`,
+and `unit-of-work-story-map.md`. A single simple unit (the whole
+application) is valid. Traceability requires the map whenever stories
+exist. Do not skip because there is only one unit.
+
 **Execute IF**:
-- System needs decomposition into multiple units of work
+- User Stories executed this cycle (`stories.md` exists), even if there is only one unit
 - Multiple services or modules required
 - Complex system requiring structured breakdown
+- New data models, APIs, or state as in workflow-planning.md Step 3.3
 
 **Skip IF**:
-- Single simple unit
-- No decomposition needed
-- Straightforward single-component implementation
+- User Stories was also skipped (no `stories.md`) AND no decomposition is needed
 
 **Execution**:
 1. **MANDATORY**: You MUST log any user input during this phase in audit.md
@@ -357,7 +369,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 4. Load reverse engineering artifacts (if brownfield)
 5. Execute at appropriate depth (minimal/standard/comprehensive)
 6. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-7. **No stage gate.** Require an acyclic DAG in `unit-of-work-dependency.md` and honor `units.max_stories_per_unit`. Run `python -m aidlc_validate units-dag --root PRODUCT_REPO` and `traceability`. Continue to `inception_end`.
+7. **No stage gate.** Require an acyclic DAG in `unit-of-work-dependency.md` and honor `units.max_stories_per_unit`. Run `python3 -m aidlc_validate units-dag --root PRODUCT_REPO` and `traceability`. Continue to `inception_end`.
 
 ## Gate `inception_end` (ALWAYS after Inception)
 
@@ -480,7 +492,7 @@ The person may change any Inception artifact. Do not start Construction until th
 1. Load `construction/design-validation.md`
 2. Default `design_validation.mode` is `hybrid`
 3. Run executable checks. Use a **separate** LLM reviewer; it must not self-approve
-4. Escalate to the person when a hybrid trigger fires, rework limit is exceeded, or the token budget is exceeded (`pause_and_ask_human`)
+4. Escalate to the person (**named gate `design_validation`**) when a hybrid trigger fires (including `public_contract`), mode is `human`, rework limit is exceeded, or the token budget is exceeded (`pause_and_ask_human`). Write the gate question to a file and present it in the assistant turn. Wait.
 5. Write `aidlc-docs/construction/{unit}/design-validation.md`
 6. On pass, continue to Code Generation for this unit. On rework, return to the design stages of the same unit
 
@@ -539,10 +551,10 @@ The person may change any Inception artifact. Do not start Construction until th
 ## Rules Validation (CONDITIONAL)
 
 **Execute IF**:
-- At least one extension is active (answer other than D/No)
+- At least one extension is opted IN (Enabled=Yes / Always Enforced, or a non-skip answer on that prompt)
 
 **Skip IF**:
-- No operational extensions were opted into (all answered D/No)
+- No operational extensions were opted IN. Opted OUT means Enabled=No, or that prompt's skip/No option (B, C, or D — whichever letter the opt-in file uses). Do not require the skip letter to be D.
 
 **Prerequisites** (evaluated at execution time, not at planning time):
 - Build and Test stage must be complete before this stage executes
@@ -575,7 +587,9 @@ The person may change any Inception artifact. Do not start Construction until th
 2. Load all steps from `operations/deployment.md`
 3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
 4. Execute deployment:
-   - Check upstream artifact prerequisites (infra design, extension plan rule mapping, build summary)
+   - **First**: the opt-in/skip question in `operations/deployment.md` (before any infrastructure-design artifact check)
+   - If skipped, mark SKIPPED and do not require Construction infrastructure artifacts
+   - If proceeding: check upstream artifact prerequisites (infra design, extension plan rule mapping, build summary)
    - Verify environment prerequisites (IaC tool, CLI, credentials, bootstrapping)
    - Verify deployment automation covers all components (infrastructure, application artifacts, assets/data)
    - Deploy infrastructure (IaC stacks)
@@ -617,11 +631,11 @@ Runs after Post-Deployment Testing, including when PDT or Deployment was SKIPPED
 
 1. **MANDATORY**: You MUST log start of Docusaurus export in audit.md
 2. Load `operations/docusaurus-export.md`
-3. Copy or refresh `templates/docusaurus-scaffold/` into `operations.docusaurus_path` (default `docs-site`) if `package.json` is missing
-4. Export included sources; omit `audit.md`, question files, raw plans, `deployment-deploy.md`
+3. **Generate** the Docusaurus scaffold **in the product repo** at `operations.docusaurus_path` (default `docs-site`) if `package.json` is missing. Write the files from `operations/docusaurus-scaffold-files.md`. Do **not** read `templates/` from the rules fork at runtime.
+4. Export included sources; omit `audit.md`, question files, raw plans, `deployment-deploy.md`. Escape `{` `}` in copied markdown so MDX does not treat `{id}` as JavaScript.
 5. Set site language from `operations.docs.language` (default `en`)
 6. Run `npm install` and `npm run build` in the docs-site folder
-7. Run `python -m aidlc_validate export --root PRODUCT_REPO`
+7. Run `python3 -m aidlc_validate export --root PRODUCT_REPO`
 8. Write `aidlc-docs/operations/docusaurus-export.md`
 
 ## Gate `operations` (ALWAYS after export)
@@ -640,7 +654,7 @@ Present `operations-summary.md`, the docs-site, SKIPPED deploy/PDT if any, and t
   - **CRITICAL**: Log every interaction, not just approvals
 - **Quality Focus**: Complex changes get full treatment, simple changes stay efficient
 - **Content Validation**: Always validate content before file creation per content-validation.md rules
-- **NO EMERGENT BEHAVIOR**: Construction design stages have no 2-option stage gate; Design Validation and `build_and_test` are the control points. Operations keeps the v1-operations checkpoints plus gate `operations`.
+- **NO EMERGENT BEHAVIOR**: Construction design stages have no 2-option stage gate; named gate `design_validation` (when triggered) and `build_and_test` are the control points. Operations keeps the v1-operations checkpoints plus gate `operations`.
 
 ## MANDATORY: Plan-Level Checkbox Enforcement
 

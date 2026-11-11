@@ -26,6 +26,11 @@ Required table:
 
 `confidence` is `high`, `medium`, or `low`.
 
+Do not put unescaped `{identifier}` in table cells (for example
+`Book {id, title}`). Spell field names without braces, or wrap them in
+backticks (`` `{id}` ``). Docusaurus export also escapes remaining braces
+so MDX does not treat `{id}` as JavaScript.
+
 ## Greenfield
 
 Build the catalog from the Full Scope Vision feature ids.

@@ -1,7 +1,8 @@
 # Automatic checks
 
 Run these with the shipped validator
-(`python -m aidlc_validate CHECK --root PRODUCT_REPO`). An LLM-only review
+(`python3 -m aidlc_validate CHECK --root PRODUCT_REPO`). Use **`python3`**.
+Do not assume a `python` command exists. An LLM-only review
 must not self-approve: if there is no executable check, escalate to the
 person.
 

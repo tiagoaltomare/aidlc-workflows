@@ -1,10 +1,10 @@
 # Deployment — Deploy and Confirm
 
-> **OVERRIDE**: This file is exempt from the Adaptive Workflow Principle and adaptive depth. Every step MUST be executed exactly as written. The model MUST NOT skip, defer, or partially complete any step. The ONLY acceptable outcome of this stage is: pipeline deployed, pipeline triggered and executed through Test stage (paused at Human Approval gate), all components verified present in pre-production — or a BLOCKED status with command output proving deployment is impossible.
+> **OVERRIDE**: This file is exempt from the Adaptive Workflow Principle and adaptive depth. Execute steps in order. **Step 1 is the opt-in/skip question** — ask it before requiring Construction infrastructure artifacts. When the customer skips (that prompt's No/skip option), mark SKIPPED and stop; that is an acceptable outcome and does **not** contradict this OVERRIDE. When the customer proceeds, every remaining step MUST be executed; the then-acceptable outcomes are: pipeline deployed, pipeline triggered and executed through Test stage (paused at Human Approval gate), all components verified present in pre-production — or a BLOCKED status with command output proving deployment is impossible.
 
 **Purpose**: Deploy the complete workload — infrastructure, application artifacts, and assets/data — to the target environment and confirm every deployable component is present and observable.
 
-**Condition**: This stage always executes. Step 2 checks whether the `extensions/deployment` extension is active — if not, the customer is asked whether to proceed. The stage may mark itself SKIPPED based on the customer's answer.
+**Condition**: This stage always executes. Step 1 checks whether the `extensions/deployment` extension is active — if not, the customer is asked whether to proceed. The stage may mark itself SKIPPED based on the customer's answer. Do not require infrastructure-design artifacts until the customer proceeds.
 
 **Prerequisite**: Rules Validation stage must be complete.
 
@@ -20,33 +20,13 @@
 
 ---
 
-## Step 1: Verify Upstream Artifacts
+## Step 1: Deployment Opt-In Check
 
-1. You MUST read each of the following artifacts:
-
-| Artifact | Location | Produced By |
-|----------|----------|-------------|
-| Infrastructure design | `aidlc-docs/construction/{unit}/infrastructure-design/infrastructure-design.md` | Infrastructure Design |
-| Extension plan rule mapping | `aidlc-docs/construction/plans/{unit}-extension-plan-rule-mapping.md` | Infrastructure Design (Steps 10–18) |
-| Build and test summary | `aidlc-docs/construction/build-and-test/build-and-test-summary.md` | Build and Test |
-| aidlc-state.md | `aidlc-docs/aidlc-state.md` | Requirements Analysis |
-
-2. You MUST confirm every artifact exists. If any artifact is missing:
-   - **GAP IF**: re-executing a Construction stage could produce the missing artifact. **MANDATORY**: You MUST load `common/design-rework.md` and follow its steps exactly to loop back to Construction.
-
-Validation check:
-- **MANDATORY**: You MUST NOT proceed to Step 2 until all 4 artifacts exist.
-- **MANDATORY**: If the extension plan rule mapping is missing and extensions are active, this is a GAP. You MUST load `common/design-rework.md`.
-
----
-
-## Step 2: Deployment Opt-In Check
-
-**MANDATORY**: You MUST perform this check before proceeding. You MUST NOT skip this step or assume the answer.
+**MANDATORY**: You MUST perform this check **before** any infrastructure-design or extension-plan artifact check. You MUST NOT skip this step or assume the answer.
 
 1. **Check `extensions/deployment` extension status**: You MUST read the Extension Configuration from `aidlc-docs/aidlc-state.md`. You MUST check whether the `extensions/deployment` extension has a corresponding `extensions/deployment/` directory with loaded rule files.
-2. **IF `operations/deployment` rules are loaded** (extension active, answer other than D/No): Proceed to Step 3. Do NOT present the question below.
-3. **IF `operations/deployment` rules are NOT loaded**: Present the following question to the customer. **MANDATORY**: You MUST wait for the customer's answer. You MUST NOT proceed without it.
+2. **IF the deployment extension is opted IN** (Enabled=Yes, or a non-skip answer on that prompt): Proceed to Step 2. Do NOT present the question below.
+3. **IF the deployment extension is NOT opted IN**: Present the following question to the customer. **MANDATORY**: You MUST wait for the customer's answer. You MUST NOT proceed without it. Named gate: Deployment opt-in. Write this question to a file (for example `aidlc-docs/operations/deployment-opt-in.md`) **and** present it in the assistant turn.
 
 ```markdown
 ## Question: Test Deployment
@@ -69,8 +49,31 @@ B) No — skip deployment and post-deployment testing
 **Answer**: [A or B with full text]
 ```
 
-5. **IF answer is B (No)**: Record stage status as SKIPPED in `aidlc-docs/aidlc-state.md`. Present: "Deployment stage SKIPPED — customer declined deployment testing." Do NOT proceed to Step 3.
-6. **IF answer is A (Yes)**: Proceed to Step 3.
+5. **IF answer is B (No)** — the skip option on this A/B prompt: Record stage status as SKIPPED in `aidlc-docs/aidlc-state.md`. Present: "Deployment stage SKIPPED — customer declined deployment testing." Do **not** require infrastructure-design artifacts. Do NOT proceed to Step 2.
+6. **IF answer is A (Yes)**: Proceed to Step 2.
+
+---
+
+## Step 2: Verify Upstream Artifacts
+
+Run this step **only if** Step 1 did not SKIP the stage.
+
+1. You MUST read each of the following artifacts:
+
+| Artifact | Location | Produced By |
+|----------|----------|-------------|
+| Infrastructure design | `aidlc-docs/construction/{unit}/infrastructure-design/infrastructure-design.md` | Infrastructure Design |
+| Extension plan rule mapping | `aidlc-docs/construction/plans/{unit}-extension-plan-rule-mapping.md` | Infrastructure Design (Steps 10–18) |
+| Build and test summary | `aidlc-docs/construction/build-and-test/build-and-test-summary.md` | Build and Test |
+| aidlc-state.md | `aidlc-docs/aidlc-state.md` | Requirements Analysis |
+
+2. You MUST confirm every artifact exists. If any artifact is missing:
+   - **GAP IF**: re-executing a Construction stage could produce the missing artifact. **MANDATORY**: You MUST load `common/design-rework.md` and follow its steps exactly to loop back to Construction.
+
+Validation check:
+- **MANDATORY**: You MUST NOT proceed to Step 3 until all 4 artifacts exist.
+- **MANDATORY**: If the extension plan rule mapping is missing and extensions are active, this is a GAP. You MUST load `common/design-rework.md`.
+- If Infrastructure Design was skipped because there are no infrastructure changes, and the customer still chose to deploy, produce a minimal local-only infrastructure-design that states "no cloud resources" **or** BLOCKED with that reason. Do not invent AWS resources.
 
 ---
 

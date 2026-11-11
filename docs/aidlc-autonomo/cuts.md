@@ -1,7 +1,8 @@
 # Cuts from the autonomous-fork plan
 
-Record of work dropped or deferred so a greenfield and a brownfield pilot can
-run end to end. Each row is a deliberate cut, not an accidental omission.
+Record of work dropped or deferred so a greenfield and a brownfield
+pilot can run end to end. Each row is a deliberate cut, not an
+accidental omission.
 
 | Phase | What was cut                                                      | Why                                                                                                   |
 | ----- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -12,5 +13,13 @@ run end to end. Each row is a deliberate cut, not an accidental omission.
 | F3    | Full INVEST scoring and breakdown-strategy enforcement            | Deadline: stories check enforces As a / I want plus min/max AC counts                                 |
 | F3    | No Python subcommand for assumptions or Vision/Tech consistency   | Agent inspects `assumptions.md` and Tech Env; executable checks stay the six CLI subcommands          |
 | F4    | No separate LLM-reviewer harness (process rule only)              | Deadline: hybrid mode is specified in rules; a second model is not spawned by this repo               |
-| F5    | F6 documentation polish (`process-overview`, user guides)         | Lowest priority; rules in `core-workflow.md` are enough for a pilot agent                             |
 | F5    | Webpack pinned to 5.101.3 in the Docusaurus scaffold              | Newer webpack ProgressPlugin breaks Docusaurus 3.9 `webpackbar` on Node 22                            |
+
+F6 documentation polish (README pointer, `getting-started.md`, welcome
+and process-overview, named-gate language) is **done** in this change.
+Pilot findings F1–F21 and PF-001–PF-015 are addressed in rules,
+validator, scaffold generation, and docs. Pilots are not re-run.
+
+Still left out (unchanged cuts): portal skills, a spawned second-model
+reviewer, full INVEST scoring, evaluator jobs on GitHub Actions CI,
+Python subcommands for assumptions / Vision–Tech consistency.

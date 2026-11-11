@@ -1,4 +1,4 @@
-"""CLI: python -m aidlc_validate CHECK --root PRODUCT_REPO"""
+"""CLI: python3 -m aidlc_validate CHECK --root PRODUCT_REPO"""
 
 from __future__ import annotations
 

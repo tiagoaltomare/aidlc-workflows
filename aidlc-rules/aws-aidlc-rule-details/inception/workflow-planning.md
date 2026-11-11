@@ -133,6 +133,7 @@ Evaluate risk level:
 - Pure implementation changes
 
 ### 3.3 Units Generation - Execute IF:
+- User Stories executed this cycle (`stories.md` exists) — **always**, even for a single simple unit
 - New data models or schemas
 - API changes or new endpoints
 - Complex algorithms or business logic
@@ -140,11 +141,10 @@ Evaluate risk level:
 - Multiple packages require changes
 - Infrastructure-as-code updates needed
 
+A single unit for the whole application is valid. Traceability needs the DAG and story map whenever stories exist.
+
 **Skip IF**:
-- Simple logic changes
-- UI-only changes
-- Configuration updates
-- Straightforward implementations
+- User Stories was also skipped (no `stories.md`) AND none of the Execute IF bullets apply
 
 ### 3.4 NFR Implementation - Execute IF:
 - Performance requirements
@@ -157,7 +157,20 @@ Evaluate risk level:
 - No new NFR requirements
 - Simple changes with no NFR impact
 
-### 3.5 Operations (Rules Validation + Deployment + Post-Deployment Testing) - Execute IF:
+### 3.5 Infrastructure Design - Execute IF:
+- Infrastructure services need mapping
+- Deployment architecture required
+- Cloud resources need specification
+- `core-workflow.md` Infrastructure Design Execute IF matches
+
+**Skip IF**:
+- No infrastructure changes
+- Infrastructure already defined
+- NFR Implementation skipped AND no new deployable resources
+
+This stage is **not** folded into NFR. Record EXECUTE or SKIP here. Code Generation still writes an N/A extension mapping when this stage is skipped and extensions are inactive.
+
+### 3.6 Operations (Rules Validation + Deployment + Post-Deployment Testing) - Execute IF:
 - Requirements will drive the creation of resources that could be subject to extension rules (e.g. observability, recovery, deployment, runbooks)
 - Requirements include non-functional concerns such as availability, resilience, monitoring, or deployment safety
 
@@ -465,24 +478,13 @@ I recommend skipping [Y] stages:
 
 **Estimated Timeline**: [Duration]
 
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the execution plan at: `aidlc-docs/inception/plans/execution-plan.md`
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Ask for modifications to the execution plan if required
-> [IF any stages are skipped:]
-> 📝 **Add Skipped Stages** - Choose to include stages currently marked as SKIP
-> ✅ **Approve & Continue** - Approve plan and proceed to **[Next Stage Name]**
+**Stage complete (no gate).** Plan: `aidlc-docs/inception/plans/execution-plan.md`. Continue. Human override of EXECUTE/SKIP is at `inception_end`. Do not wait for per-stage approval.
 ```
 
 ## Step 10: Handle User Response
 
-- **If approved**: Proceed to next stage in execution plan
-- **If changes requested**: Update execution plan and re-confirm
-- **If user wants to force include/exclude stages**: Update plan accordingly
+- Do not wait here. Continue to Application Design, Units Generation, or `inception_end` as the plan says.
+- Human override of EXECUTE/SKIP is at `inception_end`.
 
 ## Step 11: Log Interaction
 

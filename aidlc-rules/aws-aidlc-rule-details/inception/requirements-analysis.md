@@ -96,7 +96,9 @@ Analyze whatever the user has provided:
 
 ### Step 5.1: Extension Opt-In Prompts
 
-**MANDATORY**: Scan all loaded `*.opt-in.md` files (loaded at workflow start from `extensions/` subdirectories) for an `## Opt-In Prompt` section. For each extension that declares one, include that question in the clarifying questions file created in Step 6.1. Present each opt-in question in the same language as the user's conversation.
+**MANDATORY**: Scan all loaded `*.opt-in.md` files (loaded at workflow start from `extensions/` subdirectories) for an `## Opt-In Prompt` section (preferred) or a `## Question` section. There is no `## Applicability Question` heading. For each extension that declares one, include that question in the clarifying questions file created in Step 6.1. Present each opt-in question in the same language as the user's conversation.
+
+Opt-in scales differ (A/B, A/B/C, A/B/C/D). Record the **letter and full text**. Opted OUT = that prompt's skip/No option (B, C, or D). Opted IN = any other listed option. Do not assume the skip letter is D.
 
 ### Step 6: Generate Clarifying Questions (PROACTIVE APPROACH)
 
@@ -238,24 +240,10 @@ Update `aidlc-docs/aidlc-state.md`:
      3. **Formatted Workflow Message** (mandatory): Always end with this exact format:
 
 ```markdown
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the requirements document at: `aidlc-docs/inception/requirements/requirements.md`
-
-
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** -  Ask for modifications to the requirements if required based on your review 
-> [IF User Stories will be skipped, add this option:]
-> 📝 **Add User Stories** - Choose to Include **User Stories** stage (currently skipped based on project simplicity)  
-> ✅ **Approve & Continue** - Approve requirements and proceed to **[User Stories/Workflow Planning]**
-
----
+**Stage complete (no gate).** Artifacts: `aidlc-docs/inception/requirements/requirements.md`. Continue to **[User Stories/Workflow Planning]**. Review is at `inception_end`. Do not wait for per-stage approval.
 ```
 
-**Note**: Include the "Add User Stories" option only when User Stories stage will be skipped. Replace [User Stories/Workflow Planning] with the actual next stage name.
+**Note**: Replace [User Stories/Workflow Planning] with the actual next stage name.
 
    - Do not wait for a stage-completion gate. Continue to User Stories or Workflow Planning. Review is at `inception_end`.
    - Update Requirements Analysis stage complete in aidlc-state.md

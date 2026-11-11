@@ -9,6 +9,8 @@ This stage decomposes the system into manageable units of work through two integ
 
 **DEFINITION**: A unit of work is a logical grouping of stories for development purposes. For microservices, each unit becomes an independently deployable service. For monoliths, the single unit represents the entire application with logical modules.
 
+**Always at least one unit when stories exist.** Do not skip this stage because there is a "single simple unit". Produce `UNIT-001` (or more), the DAG, and the story map so traceability can run. Skip this stage only when User Stories was also skipped.
+
 **Terminology**: Use "Service" for independently deployable components, "Module" for logical groupings within a service, "Unit of Work" for planning context.
 
 ## Prerequisites
@@ -134,19 +136,11 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 
 [AI-generated summary of units and decomposition created in bullet points]
 
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the units generation artifacts at: `aidlc-docs/inception/application-design/`
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Ask for modifications to the units generation if required
-> ✅ **Approve & Continue** - Approve units and proceed to **CONSTRUCTION PHASE**
+**Stage complete (no gate).** Artifacts: `aidlc-docs/inception/application-design/` (`unit-of-work.md`, DAG, story map). Continue to `inception_end`. Do not wait for per-stage approval.
 ```
 
 ## Step 17: No units gate
-- Run `python -m aidlc_validate units-dag --root PRODUCT_REPO`. Continue to `inception_end`.
+- Run `python3 -m aidlc_validate units-dag --root PRODUCT_REPO`. Continue to `inception_end`.
 
 ## Step 18: Record Approval Response
 - Log the user's approval response with timestamp in `aidlc-docs/audit.md`
@@ -167,7 +161,7 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 - Use [Answer]: tag format for all questions
 - Analyze all answers for ambiguities before proceeding
 - Resolve ALL ambiguities with follow-up questions
-- Get explicit user approval before generation
+- No plan gate. Non-blocking answers go to `assumptions.md`. Continue. Review is at `inception_end`.
 
 ### Generation Phase Rules
 - **NO HARDCODED LOGIC**: Only execute what's written in the unit of work plan
@@ -177,11 +171,12 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 - **VERIFY COMPLETION**: Ensure all unit artifacts are complete before proceeding
 
 ## Completion Criteria
-- All planning questions answered and ambiguities resolved
-- User approval obtained for the plan
+- All planning questions answered (blocking) or copied to `assumptions.md` (non-blocking)
 - All steps in unit of work plan marked [x]
+- At least one `UNIT-` record when stories exist
 - All unit artifacts generated according to plan:
   - `unit-of-work.md` with unit definitions
   - `unit-of-work-dependency.md` with dependency matrix
   - `unit-of-work-story-map.md` with story mappings
-- Units verified and ready for per-unit design stages
+- Validator `units-dag` and `traceability` run
+- Ready for `inception_end`

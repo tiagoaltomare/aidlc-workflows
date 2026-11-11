@@ -2,8 +2,12 @@
 
 ## MANDATORY: All Questions Must Use This Format
 
-### Rule: Never Ask Questions in Chat
-**CRITICAL**: You must NEVER ask questions directly in the chat. ALL questions must be placed in dedicated question files.
+### Rule: Never Ask Questions Only in Chat
+**CRITICAL**: You must NEVER ask **non-gate** questions only in the chat. Write them to a dedicated question file.
+
+**Named gates** (see `welcome-message.md` / `process-overview.md`) MAY be presented in the assistant turn **and** must still be written to a file under `aidlc-docs/`. That includes `reverse_engineering`, `vision_scope`, extension opt-in, `inception_end`, `design_validation`, `build_and_test`, v1-operations checkpoints, Deployment opt-in, and `operations`.
+
+**Autonomous Inception / Construction:** non-blocking questions go to the question file **and** `aidlc-docs/assumptions.md`. Do **not** wait for the person to say "done" on those. Continue. Only blocking questions and named gates wait.
 
 ### Question File Format
 
@@ -173,8 +177,10 @@ Please answer each question by filling in the letter choice after the [Answer]: 
 If none of the options match your needs, choose the last option (Other) and describe your preference. Let me know when you're done."
 ```
 
-#### Step 3: Wait for Confirmation
-Wait for user to say "done", "completed", "finished", or similar.
+#### Step 3: Wait for Confirmation (blocking questions and named gates only)
+For a **blocking** question or a **named gate**: wait for the person to fill `[Answer]:` (or say "done", "completed", "finished").
+
+For a **non-blocking** question in autonomous Inception/Construction: copy the unanswered item to `aidlc-docs/assumptions.md` with a default and rationale, and **continue**. Do not wait for "done".
 
 #### Step 4: Read and Analyze
 ```
@@ -358,12 +364,13 @@ E) Other (please describe after [Answer]: tag below)
 - ✅ **Always include "Other" as the LAST option (MANDATORY)**
 - ✅ Only include meaningful options - don't make up options to fill slots
 - ✅ Always use [Answer]: tags
-- ✅ Always wait for user completion
+- ✅ Wait for user completion on **blocking questions and named gates**
+- ✅ Copy non-blocking questions to `assumptions.md` and continue (autonomous Inception/Construction)
 - ✅ Always validate responses for contradictions
 - ✅ Always create clarification files if needed
 - ✅ Always resolve contradictions before proceeding
-- ❌ Never ask questions in chat
+- ❌ Never ask non-gate questions only in chat
 - ❌ Never make up options just to have A, B, C, D
-- ❌ Never proceed without answers
-- ❌ Never proceed with unresolved contradictions
-- ❌ Never make assumptions about ambiguous responses
+- ❌ Never proceed past a named gate without an answer
+- ❌ Never proceed with unresolved contradictions on blocking questions
+- ❌ Never make assumptions about ambiguous **blocking** responses

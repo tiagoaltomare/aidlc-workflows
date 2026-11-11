@@ -5,10 +5,14 @@ Run after the feature catalog. Ends in the human gate `vision_scope`.
 
 ## Path
 
-Write `aidlc-docs/vision/scopes/scope-<id>.md`. Set `scope.current_path` in
-`aidlc.config.yaml` to the scope for this cycle (default
-`aidlc-docs/vision/scopes/scope-atual.md` may be a copy or a symlink-like
-duplicate of the chosen `scope-*.md`; a regular file is enough).
+Write `aidlc-docs/vision/scopes/scope-<id>.md` (canonical, e.g.
+`scope-001.md` for `SCOPE-001`). Set `scope.current_path` in
+`aidlc.config.yaml` to **that canonical file** for this cycle.
+
+`scope-atual.md` is an **optional alias** of the current canonical file
+(same `SCOPE-` id and same In/Out sections). Do not treat the alias as a
+second in-scope set. The validator uses `scope.current_path` when set, and
+de-duplicates files that share a `SCOPE-` id.
 
 Ids use `SCOPE-` (see `scripts/aidlc-validate/README.md`).
 
@@ -46,7 +50,7 @@ At least one in-scope feature is required for a pilot cycle.
 Run, from this fork, with `PYTHONPATH` including `scripts/aidlc-validate`:
 
 ```bash
-python -m aidlc_validate scope-in-vision --root PRODUCT_REPO
+python3 -m aidlc_validate scope-in-vision --root PRODUCT_REPO
 ```
 
 Non-zero exit is blocking. Every in-scope `FEAT-` id MUST resolve in

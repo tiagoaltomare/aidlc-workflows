@@ -1,6 +1,8 @@
 schema_version: "1"
 project_type: greenfield
 depth: standard
+scope:
+  current_path: aidlc-docs/vision/scopes/scope-001.md
 design_validation:
   mode: hybrid
 operations:

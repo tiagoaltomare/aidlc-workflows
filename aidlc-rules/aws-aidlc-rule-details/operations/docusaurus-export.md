@@ -11,15 +11,22 @@ From `aidlc.config.yaml` `operations.*`:
 - `docs.language` (default `en`)
 - `include` / `exclude` (defaults in `docs/aidlc.config.example.yaml`)
 
-## Scaffold
+## Scaffold — generate in the product repo
 
-If `operations.docusaurus_path` is missing `package.json`, copy the fork
-template `templates/docusaurus-scaffold/` into that folder:
+If `operations.docusaurus_path` is missing `package.json`, **write** the
+files listed in `operations/docusaurus-scaffold-files.md` into that folder
+in the **product** repository:
 
 - `package.json`
 - `docusaurus.config.js` (set `i18n.defaultLocale` to `operations.docs.language`)
 - `sidebars.js`
-- `docs/` for exported markdown
+- `src/css/custom.css`
+- `docs/index.md` (placeholder; exported sources replace/extend `docs/`)
+- `static/img/.gitkeep`
+
+Do **not** read or copy `templates/docusaurus-scaffold/` from the rules
+fork at runtime. That tree is a CI fixture in this fork only. The product
+site is generated here.
 
 Then `npm install` and `npm run build` in that folder. A failing build is
 blocking.
@@ -30,11 +37,26 @@ Copy included sources into `docs/` using the markers in
 `scripts/aidlc-validate/README.md`. **Must be absent** from the site tree:
 `audit.md`, `deployment-deploy.md`, question files, raw plans.
 
+### MDX braces
+
+Docusaurus 3 compiles markdown as MDX. A cell such as `Book {id, title}`
+fails the build (`id is not defined`). When copying markdown into
+`docs-site/`:
+
+1. Prefer rewriting `{identifier}` as `` `{identifier}` `` or as the
+   identifier without braces.
+2. Otherwise escape `{` as `\{` and `}` as `\}` **outside fenced and
+   inline code**.
+3. Do not change the source under `aidlc-docs/` unless the catalog itself
+   used braces; the exported copy must be MDX-safe.
+
 Run:
 
 ```bash
-python -m aidlc_validate export --root PRODUCT_REPO
+python3 -m aidlc_validate export --root PRODUCT_REPO
 ```
+
+Use **`python3`**. Do not assume a `python` command exists.
 
 Write `aidlc-docs/operations/docusaurus-export.md` with what was copied and
 the validator result.

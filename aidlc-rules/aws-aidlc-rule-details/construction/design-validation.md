@@ -28,8 +28,12 @@ run, that is trigger `no_executable_check`.
 
 ## Human triggers (`hybrid` / `auto`)
 
-Escalate and **wait** when any of these is true (from
-`design_validation.human_triggers`, defaults below):
+Escalate and **wait** (**named gate `design_validation`**) when any of these
+is true (from `design_validation.human_triggers`, defaults below). Write the
+gate question to `aidlc-docs/construction/{unit}/design-validation-gate.md`
+and present it in the assistant turn. This gate is one of the named
+checkpoints in `welcome-message.md` / `process-overview.md`, including when
+`public_contract` fires because this cycle changes a published API.
 
 - `persistent_data` — unit writes durable data
 - `security` — authn/authz, secrets, threat surface

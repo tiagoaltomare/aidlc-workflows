@@ -120,23 +120,12 @@ If the analysis in step 8 reveals ANY ambiguous answers, you MUST:
 
 [AI-generated summary of application design artifacts created in bullet points]
 
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the application design artifacts at: `aidlc-docs/inception/application-design/`
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Ask for modifications to the application design if required
-> [IF Units Generation is skipped:]
-> 📝 **Add Units Generation** - Choose to include **Units Generation** stage (currently skipped)
-> ✅ **Approve & Continue** - Approve design and proceed to **[Units Generation/CONSTRUCTION PHASE]**
+**Stage complete (no gate).** Artifacts: `aidlc-docs/inception/application-design/`. Continue to Units Generation (when stories exist) or `inception_end`. Do not wait for per-stage approval.
 ```
 
 ### 13. No stage gate — continue. Review is at `inception_end`.
-- Do not proceed until the user explicitly approves the application design
-- Approval must be clear and unambiguous
-- If user requests changes, update the design and repeat the approval process
+- Do not wait for a person. Continue.
+- If Units Generation will run, go there next; otherwise go to `inception_end`.
 
 ### 14. Record Approval Response
 - Log the user's approval response with timestamp in `aidlc-docs/audit.md`

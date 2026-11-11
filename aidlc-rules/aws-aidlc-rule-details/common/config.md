@@ -22,8 +22,10 @@ When the file is present, validate it **before** any stage work by running the
 shipped validator (non-zero exit means refuse):
 
 ```bash
-python -m aidlc_validate config --root PRODUCT_REPO
+python3 -m aidlc_validate config --root PRODUCT_REPO
 ```
+
+Use **`python3`**. Do not assume a `python` command exists.
 
 Run that command with `PYTHONPATH` set to this fork's `scripts/aidlc-validate`
 directory, or install the `aidlc-validate` package first.
@@ -56,5 +58,6 @@ On a passing check:
    - `design_validation.mode` = `hybrid`
    - `operations.docs.language` = `en`
 3. Keep the values for later stages. Do not treat the config as a reason to
-   skip a recorded human gate (`reverse_engineering`, `build_and_test`,
-   Operations checkpoints, or later fork gates).
+   skip a recorded human gate (`reverse_engineering`, `vision_scope`,
+   `inception_end`, `design_validation`, `build_and_test`, Operations
+   checkpoints, Deployment opt-in, or `operations`).

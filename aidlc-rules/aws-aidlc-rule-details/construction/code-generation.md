@@ -2,7 +2,7 @@
 
 **Autonomous Construction:** the code-generation plan still exists with checkboxes, but there is no human plan approval. Execute the plan. Next unit follows the DAG. `build_and_test` stays a human gate.
 
-> **OVERRIDE**: Steps 4–7 in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. When extensions are active, Steps 4–7 MUST be executed. The model MUST NOT skip them, combine them, or treat them as optional. These steps produce the per-resource extension code plan which ensures every rule × resource combination has its own checklist item in the final code generation plan.
+> **OVERRIDE**: Steps 4–7 in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. **When extensions are active** (Enabled=Yes in Extension Configuration), Steps 4–7 MUST be executed as written. The model MUST NOT skip them, combine them, or treat them as optional. These steps produce the per-resource extension code plan which ensures every rule × resource combination has its own checklist item in the final code generation plan. **When extensions are inactive**, still execute Step 4 far enough to write an N/A mapping file (every resource recorded as N/A with rationale) and an empty extension code plan. Do not skip the N/A write. Do not invent extension code.
 
 ## Overview
 This stage generates code for each unit of work through two integrated parts:
@@ -36,6 +36,7 @@ This stage generates code for each unit of work through two integrated parts:
 - [ ] Read workspace root and project type from `aidlc-docs/aidlc-state.md`
 - [ ] Determine code location (see Critical Rules for structure patterns)
 - [ ] **Brownfield only**: Review reverse engineering code-structure.md for existing files to modify
+   - [ ] **AGENTS.md**: follow `common/agents-md.md`. If a scaffold (for example create-next-app) would overwrite `AGENTS.md`, merge: keep the AI-DLC pointer to `core-workflow.md` and append the scaffold notes. Never replace the AI-DLC file.
 - [ ] Document exact paths (never aidlc-docs/)
 
 ## Step 3: Create Application Code Plan
@@ -191,21 +192,7 @@ Validation check:
      3. **Formatted Workflow Message** (mandatory): Always end with this exact format:
 
 ```markdown
-> **📋 <u>**REVIEW REQUIRED:**</u>**  
-> Please examine the generated code at:
-> - **Code** (source, IaC, operational artifacts): `[actual-workspace-path]`
-> - **Documentation**: `aidlc-docs/construction/[unit-name]/code/`
-
-
-
-> **🚀 <u>**WHAT'S NEXT?**</u>**
->
-> **You may:**
->
-> 🔧 **Request Changes** - Ask for modifications to the generated code based on your review  
-> ✅ **Continue to Next Stage** - Approve code generation and proceed to **[next-unit/Build & Test]**
-
----
+**Stage complete (no gate).** Code: `[actual-workspace-path]`. Docs: `aidlc-docs/construction/[unit-name]/code/`. Continue to the next unit or Build and Test. Do not wait for per-stage approval.
 ```
 
 ## Step 20: No stage gate
@@ -241,7 +228,7 @@ Validation check:
 - Create explicit, numbered steps for all generation activities
 - Include story traceability in the plan
 - Document unit context and dependencies
-- Get explicit user approval before generation
+- No plan gate. Execute the plan. Review is at `build_and_test`.
 
 ### Generation Phase Rules
 - **NO HARDCODED LOGIC**: Only execute what's written in the unit plan
@@ -258,7 +245,7 @@ When generating UI code (web, mobile, desktop), ensure elements are automation-f
 - Keep `data-testid` values stable across code changes (only change when element purpose changes)
 
 ## Completion Criteria
-- Complete unit code generation plan created and approved
+- Complete unit code generation plan created (no human plan approval)
 - All steps in unit code generation plan marked [x]
 - All unit stories implemented according to plan
 - All code and tests generated (tests will be executed in Build & Test phase)
