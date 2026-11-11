@@ -64,14 +64,13 @@ This stage decomposes the system into manageable units of work through two integ
 - Ensure plan covers all aspects of system decomposition
 
 ## Step 5: Request User Input
-- Ask user to fill [Answer]: tags directly in the plan document
-- Emphasize importance of decomposition decisions
-- Provide clear instructions on completing the [Answer]: tags
+- Write questions with `[Answer]:` tags in the plan
+- The agent fills them (or copies non-blocking items to `aidlc-docs/assumptions.md`)
+- Do **not** wait for a person. Blocking questions still stop (`common/assumptions.md`)
 
 ## Step 6: Collect Answers
-- Wait for user to provide answers to all questions using [Answer]: tags in the document
-- Do not proceed until ALL [Answer]: tags are completed
-- Review the document to ensure no [Answer]: tags are left blank
+- Fill remaining `[Answer]:` tags or copy them to `assumptions.md`
+- Do not wait for a person. Do not record a per-stage approval
 
 ## Step 7: ANALYZE ANSWERS (MANDATORY)
 Before proceeding, you MUST carefully review all user answers for:
@@ -84,7 +83,7 @@ Before proceeding, you MUST carefully review all user answers for:
 ## Step 8: MANDATORY Follow-up Questions
 If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 - Add specific follow-up questions to the plan document using [Answer]: tags
-- DO NOT proceed to approval until all ambiguities are resolved
+- Resolve ambiguities by filling `[Answer]:` tags or copying to `assumptions.md`. Do not wait for a per-stage approval
 - Examples of required follow-ups:
   - "You mentioned 'mix of A and B' - what specific criteria should determine when to use A vs B?"
   - "You said 'somewhere between A and B' - can you define the exact middle ground approach?"
@@ -94,10 +93,9 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 ## Step 9: No plan gate
 - Do not wait. Continue to generation. Honor `units.max_stories_per_unit`.
 
-## Step 10: Log Approval
-- Log prompt and response in audit.md with timestamp
+## Step 10: Log planning complete
+- Log timestamp in `aidlc-docs/audit.md` that the unit plan is ready (no approval prompt)
 - Use ISO 8601 timestamp format
-- Include complete approval prompt text
 
 ## Step 11: Update Progress
 - Mark Units Generation Part 1 (Planning) complete in aidlc-state.md
@@ -116,7 +114,7 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 ## Step 13: Execute Current Step
 - [ ] Perform exactly what the current step describes
 - [ ] Generate unit artifacts as specified in the plan
-- [ ] Follow the approved decomposition approach from Planning
+- [ ] Follow the decomposition approach from Planning
 - [ ] Use the criteria and boundaries specified in the plan
 
 ## Step 14: Update Progress
@@ -142,10 +140,8 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 ## Step 17: No units gate
 - Run `python3 -m aidlc_validate units-dag --root PRODUCT_REPO`. Continue to `inception_end`.
 
-## Step 18: Record Approval Response
-- Log the user's approval response with timestamp in `aidlc-docs/audit.md`
-- Include the exact user response text
-- Mark the approval status clearly
+## Step 18: Log stage complete
+- Log in `aidlc-docs/audit.md` that Units Generation finished. Do not record a per-stage approval.
 
 ## Step 19: Update Progress
 - Mark Units Generation stage complete in `aidlc-docs/aidlc-state.md`

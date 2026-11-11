@@ -50,9 +50,9 @@ Incorporate NFR requirements into unit design using patterns and logical compone
 - Include all [Answer]: tags for user input
 
 ### Step 5: Collect and Analyze Answers
-- Wait for user to complete all [Answer]: tags
-- Review for vague or ambiguous responses
-- Add follow-up questions if needed
+- The agent fills `[Answer]:` tags or copies non-blocking items to `aidlc-docs/assumptions.md`. Do **not** wait for a person.
+- Review filled answers; follow-ups that are non-blocking also go to `assumptions.md`
+- Do not record a per-stage approval
 
 ### Step 6: Generate NFR Design Artifacts
 - Create `aidlc-docs/construction/{unit-name}/nfr-design/nfr-design-patterns.md`
@@ -82,7 +82,6 @@ Incorporate NFR requirements into unit design using patterns and logical compone
 ### Step 8: No stage gate
 - Do not wait. Continue to Infrastructure Design or Design Validation.
 
-### Step 9: Record Approval and Update Progress
-- Log approval in audit.md with timestamp
-- Record the user's approval response with timestamp
+### Step 9: Log stage complete
+- Log in `aidlc-docs/audit.md` that NFR Design finished. Do not record a per-stage approval.
 - Mark NFR Design stage complete in aidlc-state.md

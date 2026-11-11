@@ -36,18 +36,31 @@ A retrofit or a later cycle MUST NOT delete a versioned Vision.
 
 ## Greenfield
 
-Generate a **complete** Vision at every `depth` (including `minimal`).
-`depth: minimal` means shorter prose per required section, not omitted
-sections. Do not produce a "start fast" sketch. Use the
-structure in `docs/writing-inputs/vision-document-guide.md`:
+Required Vision **sections depend on `depth`** (`aidlc.config.yaml` / Workspace
+Detection). Use the wording in `docs/writing-inputs/vision-document-guide.md`
+for whichever sections apply. Do not require the full guide at `minimal`.
+
+**`depth: minimal`** — only these sections:
+
+1. Executive Summary (a few sentences: what it is, who it is for)
+2. Feature list with a stable `FEAT-` id per feature (the catalog still
+   holds the table; see `inception/feature-catalog.md`)
+3. Cycle cut — pointer to the versioned scope file(s). Do **not** use a
+   single loose "MVP" block
+
+Do not require Business Context subsections, Risks and Dependencies, or
+long-form alternatives at `minimal`.
+
+**`depth: standard`** — all of:
 
 1. Executive Summary
-2. Business Context
-3. Full Scope Vision, with a stable `FEAT-` id per feature (see
-   `inception/feature-catalog.md`)
-4. Cycle cut — do **not** use a single loose "MVP" block; the cut is the
-   versioned scope files
-5. Risks and Dependencies
+2. Business Context (problem, users, success)
+3. Full Scope Vision, with a stable `FEAT-` id per feature
+4. Cycle cut (versioned scope files)
+5. Risks and Dependencies (brief)
+
+**`depth: comprehensive`** — the standard sections with extensive detail
+(drivers, constraints, metrics, stakeholders, alternatives).
 
 Long-term vision and the cycle cut stay distinct.
 

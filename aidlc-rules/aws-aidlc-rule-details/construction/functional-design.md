@@ -59,12 +59,10 @@ Design detailed business logic for the unit, technology-agnostic and focused pur
 - Include all [Answer]: tags for user input
 
 ### Step 5: Collect and Analyze Answers
-- Wait for user to complete all [Answer]: tags
-- **MANDATORY**: Carefully review ALL responses for vague or ambiguous answers
-- **CRITICAL**: Add follow-up questions for ANY unclear responses - do not proceed with ambiguity
-- Look for responses like "depends", "maybe", "not sure", "mix of", "somewhere between"
-- Create clarification questions file if ANY ambiguities are detected
-- **Do not proceed until ALL ambiguities are resolved**
+- The agent fills `[Answer]:` tags or copies non-blocking items to `aidlc-docs/assumptions.md`. Do **not** wait for a person.
+- Review filled answers for vague or ambiguous wording; resolve by filling follow-ups or copying to `assumptions.md`
+- Blocking questions still stop (`common/assumptions.md`)
+- Do not record a per-stage approval
 
 ### Step 6: Generate Functional Design Artifacts
 - Create `aidlc-docs/construction/{unit-name}/functional-design/business-logic-model.md`
@@ -101,7 +99,6 @@ Design detailed business logic for the unit, technology-agnostic and focused pur
 ### Step 8: No stage gate
 - Do not wait. Continue to the next design stage of this unit or to Design Validation.
 
-### Step 9: Record Approval and Update Progress
-- Log approval in audit.md with timestamp
-- Record the user's approval response with timestamp
+### Step 9: Log stage complete
+- Log in `aidlc-docs/audit.md` that Functional Design finished. Do not record a per-stage approval.
 - Mark Functional Design stage complete in aidlc-state.md

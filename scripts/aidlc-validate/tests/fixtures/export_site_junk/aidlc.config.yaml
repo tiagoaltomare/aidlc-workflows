@@ -1,0 +1,31 @@
+schema_version: "1"
+project_type: greenfield
+depth: standard
+scope:
+  current_path: aidlc-docs/vision/scopes/scope-001.md
+design_validation:
+  mode: hybrid
+operations:
+  docusaurus_path: docs-site
+  export_default: true
+  docs:
+    language: en
+  include:
+    - vision
+    - technical_environment
+    - features
+    - scopes
+    - requirements
+    - user_stories
+    - application_design
+    - units
+    - construction_designs
+    - build_and_test_summary
+    - operations_summary
+    - rules_validation_report
+    - post_deployment_test_report
+  exclude:
+    - audit
+    - question_files
+    - raw_plans
+    - deployment_deploy_log

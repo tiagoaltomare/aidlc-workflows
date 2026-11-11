@@ -205,3 +205,27 @@ def test_export_escaped_mdx_braces_pass(tmp_path: Path):
     rc, out, err = _run("export", repo)
     assert rc == 0, err
     assert "export: pass" in out
+
+
+def test_export_unescaped_answer_line_fails():
+    rc, _out, err = _run("export", FIXTURES / "export_unescaped_answer")
+    assert rc == 1
+    assert "unescaped [Answer]:" in err
+
+
+def test_export_escaped_answer_line_passes(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    stories = repo / "docs-site" / "docs" / "stories.md"
+    stories.write_text(
+        "# Stories\n\n\\[Answer\\]: A\n",
+        encoding="utf-8",
+    )
+    rc, out, err = _run("export", repo)
+    assert rc == 0, err
+    assert "export: pass" in out
+
+
+def test_export_skips_node_modules_build_docusaurus():
+    rc, out, err = _run("export", FIXTURES / "export_site_junk")
+    assert rc == 0, err
+    assert "export: pass" in out

@@ -2,7 +2,7 @@
 
 **Autonomous Construction:** the code-generation plan still exists with checkboxes, but there is no human plan approval. Execute the plan. Next unit follows the DAG. `build_and_test` stays a human gate.
 
-> **OVERRIDE**: Steps 4–7 in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. **When extensions are active** (Enabled=Yes in Extension Configuration), Steps 4–7 MUST be executed as written. The model MUST NOT skip them, combine them, or treat them as optional. These steps produce the per-resource extension code plan which ensures every rule × resource combination has its own checklist item in the final code generation plan. **When extensions are inactive**, still execute Step 4 far enough to write an N/A mapping file (every resource recorded as N/A with rationale) and an empty extension code plan. Do not skip the N/A write. Do not invent extension code.
+> **OVERRIDE**: Steps 4–7 in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions **when they run**. **When extensions are opted IN and Infrastructure Design ran for this unit**, Steps 4–7 MUST be executed as written. The model MUST NOT skip them, combine them, or treat them as optional. These steps produce the per-resource extension code plan which ensures every rule × resource combination has its own checklist item in the final code generation plan. **When no extension is opted IN, or Infrastructure Design was skipped, do not write a mapping file or an extension code plan.** Skip Steps 4–7. Do not invent N/A rows. Merge only the application code plan into the final code generation plan.
 
 ## Overview
 This stage generates code for each unit of work through two integrated parts:
@@ -60,16 +60,23 @@ This stage generates code for each unit of work through two integrated parts:
 - [ ] Write application code steps to `aidlc-docs/construction/plans/{unit-name}-application-code-plan.md`
 
 ## Step 4: Verify Extension Plan Rule Mapping
+
+**Skip Steps 4–7. Write no mapping file** when either of these is true:
+
+- no extension is opted IN (Enabled=No, or that prompt's skip/No option)
+- Infrastructure Design was skipped for this unit
+
+Do **not** create `{unit-name}-extension-plan-rule-mapping.md` or
+`{unit-name}-extension-code-plan.md` in those cases. Continue at Step 8
+with the application code plan only.
+
+**When extensions are opted IN and Infrastructure Design ran:**
+
 - [ ] Read `aidlc-docs/construction/plans/{unit-name}-extension-plan-rule-mapping.md` (produced during Infrastructure Design)
 - [ ] Verify the mapping includes every AWS resource from the infrastructure design
 - [ ] Verify every active rule is mapped to every resource it can technically apply to
 - [ ] If any rule × resource combinations are missing, add them to the mapping file
-- [ ] If the mapping file does not exist (Infrastructure Design was skipped), build it now:
-  - List every AWS resource from available design artifacts (NFR Design, application design)
-  - For each active extension, read rule files per the opt-in answer in aidlc-state.md
-  - For each rule, map it to every resource it is technically possible to apply the rule to
-  - Rules with no applicable resources are recorded as N/A with rationale
-  - Write to `aidlc-docs/construction/plans/{unit-name}-extension-plan-rule-mapping.md`
+- [ ] If the mapping file is missing even though Infrastructure Design ran and extensions are active, that is a gap: rebuild it from the infrastructure-design artifacts (do not invent resources)
 
 ## Step 5: Create Extension Code Plan
 - [ ] Read `aidlc-docs/construction/plans/{unit-name}-extension-plan-rule-mapping.md`
@@ -105,6 +112,7 @@ This stage generates code for each unit of work through two integrated parts:
 
 ## Step 9: Save Final Code Generation Plan
 - [ ] Save complete plan as `aidlc-docs/construction/plans/{unit-name}-code-generation-plan.md`
+- [ ] If Steps 4–7 were skipped (no mapping file), this file is the application code plan only
 - [ ] Include step numbering (Step 1, Step 2, etc.)
 - [ ] Include unit context and dependencies
 - [ ] Include story traceability
@@ -117,8 +125,8 @@ This stage generates code for each unit of work through two integrated parts:
 - [ ] Explain step sequence and story coverage
 - [ ] Note total number of steps and estimated scope
 
-## Step 11: Log Approval Prompt
-- [ ] Before asking for approval, log the prompt with timestamp in `aidlc-docs/audit.md`
+## Step 11: Log plan ready
+- [ ] Log timestamp in `aidlc-docs/audit.md` that the unit code generation plan is ready (no approval prompt)
 - [ ] Include reference to the complete unit code generation plan
 - [ ] Use ISO 8601 timestamp format
 
@@ -126,10 +134,8 @@ This stage generates code for each unit of work through two integrated parts:
 - [ ] Do not wait for a person. Execute the plan (Part 2)
 - [ ] Blocking questions still stop the run (`common/assumptions.md`)
 
-## Step 13: Record Approval Response
-- [ ] Log the user's approval response with timestamp in `aidlc-docs/audit.md`
-- [ ] Include the exact user response text
-- [ ] Mark the approval status clearly
+## Step 13: Log planning complete
+- [ ] Log in `aidlc-docs/audit.md` that code-generation planning finished. Do not record a per-stage approval.
 
 ## Step 14: Update Progress
 - [ ] Mark Code Generation Part 1 (Planning) complete in `aidlc-state.md`
@@ -198,9 +204,8 @@ Validation check:
 ## Step 20: No stage gate
 - Do not wait. Continue to the next unit in DAG order, or to Build and Test.
 
-## Step 21: Record Approval and Update Progress
-- Log approval in audit.md with timestamp
-- Record the user's approval response with timestamp
+## Step 21: Log stage complete
+- Log in `aidlc-docs/audit.md` that Code Generation finished for this unit. Do not record a per-stage approval.
 - Mark Code Generation stage as complete for this unit in aidlc-state.md
 
 ---

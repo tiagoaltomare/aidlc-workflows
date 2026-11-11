@@ -21,7 +21,7 @@ Adaptive depth MUST NOT be applied to blocking rules. All extension rules are bl
 - **Simple problems** / `depth: minimal`: Concise artifacts with essential detail
 - **Complex problems** / `depth: comprehensive`: Extensive detail
 - **Model decides**: Based on problem characteristics and `aidlc.config.yaml` `depth`, not by dropping sections
-- **Vision is depth-aware, not section-optional**: at `minimal`, every required Vision section still exists; the prose is shorter. Same for Tech Env, catalog, and scopes.
+- **Vision is depth-aware**: `minimal` requires only the short section list in `create-vision.md` (summary, FEAT- list, cycle-cut pointer). `standard` and `comprehensive` require the full section list. Other stages still create all defined *artifacts*; Vision is the exception where the *section list* itself follows depth.
 
 ## Factors Influencing Detail Level
 

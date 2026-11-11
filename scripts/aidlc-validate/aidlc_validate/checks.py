@@ -339,6 +339,19 @@ def _mdx_unescaped_idents(text: str) -> list[str]:
     return MDX_IDENT_RE.findall(stripped)
 
 
+SKIP_SITE_DIRS = frozenset({"node_modules", "build", ".docusaurus"})
+ANSWER_LINE_RE = re.compile(r"^\s*\[Answer\]:", re.M)
+
+
+def _iter_site_paths(site: Path, pattern: str = "*"):
+    """Walk the docs-site tree, skipping install and build output."""
+    for path in site.rglob(pattern):
+        rel = path.relative_to(site).parts
+        if any(part in SKIP_SITE_DIRS for part in rel):
+            continue
+        yield path
+
+
 def _covers_map(text: str, item_kind: str, covers_kind: str) -> dict[str, set[str]]:
     """Map heading IDs of item_kind to IDs listed on Covers:/Requirement: lines."""
     mapping: dict[str, set[str]] = {}
@@ -494,7 +507,8 @@ def check_export(root: Path) -> list[str]:
     include = ops.get("include") or DEFAULT_INCLUDE
     exclude = ops.get("exclude") or DEFAULT_EXCLUDE
 
-    names = {p.name for p in site.rglob("*")}
+    site_files = list(_iter_site_paths(site))
+    names = {p.name for p in site_files}
     for key in include:
         marker = INCLUDE_MARKERS.get(key)
         if not marker:
@@ -504,6 +518,7 @@ def check_export(root: Path) -> list[str]:
         if name not in names:
             errors.append(f"export: included source {key!r} missing ({name})")
 
+    md_files = [p for p in site_files if p.suffix == ".md"]
     for key in exclude:
         if key == "audit" and "audit.md" in names:
             errors.append("export: excluded audit.md is present in the docs-site folder")
@@ -514,7 +529,7 @@ def check_export(root: Path) -> list[str]:
         elif key == "question_files":
             hits = [
                 str(p.relative_to(root))
-                for p in site.rglob("*.md")
+                for p in md_files
                 if QUESTION_NAME_RE.search(p.name)
             ]
             if hits:
@@ -522,19 +537,25 @@ def check_export(root: Path) -> list[str]:
         elif key == "raw_plans":
             hits = [
                 str(p.relative_to(root))
-                for p in site.rglob("*.md")
+                for p in md_files
                 if PLAN_NAME_RE.search(p.name) or "plans" in p.relative_to(site).parts
             ]
             if hits:
                 errors.append("export: excluded raw plans present: " + ", ".join(hits))
 
-    for md in sorted(site.rglob("*.md")):
-        idents = _mdx_unescaped_idents(_read(md))
+    for md in sorted(md_files):
+        text = _read(md)
+        rel = md.relative_to(root)
+        idents = _mdx_unescaped_idents(text)
         if idents:
-            rel = md.relative_to(root)
             errors.append(
                 f"export: unescaped MDX identifier {idents[0]!r} in {rel} "
                 r"(escape braces like \{id\} or wrap in backticks)"
+            )
+        if ANSWER_LINE_RE.search(text):
+            errors.append(
+                f"export: unescaped [Answer]: line in {rel} "
+                r"(rewrite as \[Answer\]: or wrap so it is not a link reference)"
             )
     return errors
 

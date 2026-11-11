@@ -120,9 +120,9 @@ Opt-in scales differ (A/B, A/B/C, A/B/C/D). Record the **letter and full text**.
    - Write questions to `requirement-verification-questions-round1.md`
    - Present the question file to the user
 
-### Step 6.1.1: Wait for User Answers (Round 1)
-   - Do not proceed until all questions in requirement-verification-questions-round1.md are answered and validated
-   - If user requests changes, update the questions and repeat
+### Step 6.1.1: Collect Round 1 answers
+   - Extension opt-in is a **blocking question**. Wait for those answers. Do not proceed without them.
+   - All other Round 1 questions are non-blocking: the agent fills `[Answer]:` tags or copies them to `aidlc-docs/assumptions.md` and continues. Do **not** wait for a person on those.
 
 ### Step 6.1.2: Record Extension Configuration and Load Rules
 
@@ -148,10 +148,10 @@ After receiving answers:
    - **MANDATORY**: Every new question identified in `extension-question-analysis.md` MUST be written to `requirement-verification-questions-round2.md`. No identified question may be omitted.
    - Present `requirement-verification-questions-round2.md` to the user
 
-### Step 6.2.1: Wait for User Answers (Round 2)
-   - Do not proceed until all questions in requirement-verification-questions-round2.md are answered and validated
-   - Analyze ALL answers from both rounds for ambiguities and create follow-up questions if needed
-   - Keep asking questions until ALL ambiguities are resolved OR user explicitly asks to proceed
+### Step 6.2.1: Collect Round 2 answers
+   - If a Round 2 question is classified blocking in `common/assumptions.md`, wait.
+   - Otherwise the agent fills `[Answer]:` tags or copies them to `aidlc-docs/assumptions.md` and continues. Do **not** wait for a person.
+   - Analyze answers for ambiguities; follow-ups that are non-blocking also go to `assumptions.md`
 
 ### Step 6.3: Merge Clarifying Questions
 

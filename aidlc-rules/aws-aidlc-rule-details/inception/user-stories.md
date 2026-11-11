@@ -171,15 +171,13 @@ For medium priority cases, execute user stories if ANY of these apply:
 - Ensure plan is comprehensive and covers all story development aspects
 
 ## Step 7: Request User Input
-- Ask user to fill in all [Answer]: tags directly in the story plan document
-- Emphasize importance of audit trail and decision documentation
-- Provide clear instructions on how to fill in the [Answer]: tags
-- Explain that all questions must be answered before proceeding
+- Write questions with `[Answer]:` tags in the story plan
+- The agent fills `[Answer]:` tags (or copies non-blocking items to `aidlc-docs/assumptions.md`)
+- Do **not** wait for a person. Blocking questions still stop (`common/assumptions.md`)
 
 ## Step 8: Collect Answers
-- Wait for user to provide answers to all questions using [Answer]: tags in the document
-- Do not proceed until ALL [Answer]: tags are completed
-- Review the document to ensure no [Answer]: tags are left blank
+- Fill remaining `[Answer]:` tags or copy them to `assumptions.md`
+- Do not wait for a person. Do not record a per-stage approval
 
 ## Step 9: ANALYZE ANSWERS (MANDATORY)
 Before proceeding, you MUST carefully review all user answers for:
@@ -194,7 +192,7 @@ Before proceeding, you MUST carefully review all user answers for:
 ## Step 10: MANDATORY Follow-up Questions
 If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 - Create a separate clarification questions file using [Answer]: tags
-- DO NOT proceed to approval until ALL ambiguities are completely resolved
+- Resolve ambiguities by filling `[Answer]:` tags or copying to `assumptions.md`. Do not wait for a per-stage approval
 - **CRITICAL**: Be thorough - ask follow-up questions for every unclear response
 - Examples of required follow-ups:
   - "You mentioned 'mix of A and B' - what specific criteria should determine when to use A vs B?"
@@ -211,19 +209,16 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 - Avoid creating development timelines or sprint planning
 - Keep focus on story structure and format decisions
 
-## Step 12: Log Approval Prompt
-- Before asking for approval, log the prompt with timestamp in `aidlc-docs/audit.md`
-- Include the complete approval prompt text
+## Step 12: Log planning complete
+- Log timestamp in `aidlc-docs/audit.md` that the story plan is ready (no approval prompt)
 - Use ISO 8601 timestamp format
 
 ## Step 13: No plan gate
 - Do not wait. Apply `stories.format`, `invest_required`, `min_acceptance_criteria`, and `max_size` from `aidlc.config.yaml`.
 - Non-blocking questions go to `aidlc-docs/assumptions.md`. Continue to generation.
 
-## Step 14: Record Approval Response
-- Log the user's approval response with timestamp in `aidlc-docs/audit.md`
-- Include the exact user response text
-- Mark the approval status clearly
+## Step 14: Log planning in state
+- Mark story planning complete in `aidlc-docs/audit.md`. Do not record a per-stage approval.
 
 ---
 
@@ -250,9 +245,8 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 - [ ] If all steps complete, verify stories are ready for next stage
 - [ ] Ensure all mandatory artifacts are generated
 
-## Step 19: Log Approval Prompt
-- Before asking for approval, log the prompt with timestamp in `aidlc-docs/audit.md`
-- Include the complete approval prompt text
+## Step 19: Log completion
+- Log timestamp in `aidlc-docs/audit.md` that stories generation finished (no approval prompt)
 - Use ISO 8601 timestamp format
 
 ## Step 20: Present Completion Message
@@ -279,10 +273,8 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 ## Step 21: No stories gate
 - Run `python3 -m aidlc_validate stories --root PRODUCT_REPO`. Do not wait for a person. Continue.
 
-## Step 22: Record Approval Response
-- Log the user's approval response with timestamp in `aidlc-docs/audit.md`
-- Include the exact user response text
-- Mark the approval status clearly
+## Step 22: Log stage complete
+- Log in `aidlc-docs/audit.md` that User Stories finished. Do not record a per-stage approval.
 
 ## Step 23: Update Progress
 - Mark User Stories stage complete in `aidlc-state.md`

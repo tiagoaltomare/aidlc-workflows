@@ -60,14 +60,13 @@ Application Design focuses on:
 - Ensure plan covers all design aspects
 
 ### 6. Request User Input
-- Ask user to fill [Answer]: tags directly in the plan document
-- Emphasize importance of design decisions
-- Provide clear instructions on completing the [Answer]: tags
+- Write questions with `[Answer]:` tags in the plan
+- The agent fills them (or copies non-blocking items to `aidlc-docs/assumptions.md`)
+- Do **not** wait for a person. Blocking questions still stop (`common/assumptions.md`)
 
 ### 7. Collect Answers
-- Wait for user to provide answers to all questions using [Answer]: tags in the document
-- Do not proceed until ALL [Answer]: tags are completed
-- Review the document to ensure no [Answer]: tags are left blank
+- Fill remaining `[Answer]:` tags or copy them to `assumptions.md`
+- Do not wait for a person. Do not record a per-stage approval
 
 ### 8. ANALYZE ANSWERS (MANDATORY)
 Before proceeding, you MUST carefully review all user answers for:
@@ -80,7 +79,7 @@ Before proceeding, you MUST carefully review all user answers for:
 ### 9. MANDATORY Follow-up Questions
 If the analysis in step 8 reveals ANY ambiguous answers, you MUST:
 - Add specific follow-up questions to the plan document using [Answer]: tags
-- DO NOT proceed to approval until all ambiguities are resolved
+- Resolve ambiguities by filling `[Answer]:` tags or copying to `assumptions.md`. Do not wait for a per-stage approval
 - Examples of required follow-ups:
   - "You mentioned 'mix of A and B' - what specific criteria should determine when to use A vs B?"
   - "You said 'somewhere between A and B' - can you define the exact middle ground approach?"
@@ -88,7 +87,7 @@ If the analysis in step 8 reveals ANY ambiguous answers, you MUST:
   - "You mentioned 'depends on complexity' - how do you define complexity levels?"
 
 ### 10. Generate Application Design Artifacts
-- Execute the approved plan to generate design artifacts
+- Execute the plan to generate design artifacts
 - Create `aidlc-docs/inception/application-design/components.md` with:
   - Component name and purpose
   - Component responsibilities
@@ -108,9 +107,8 @@ If the analysis in step 8 reveals ANY ambiguous answers, you MUST:
   - Data flow diagrams
 - Create `aidlc-docs/inception/application-design/application-design.md` that consolidates the multiple design docs created above in a single doc.
 
-### 11. Log Approval
-- Log approval prompt with timestamp in `aidlc-docs/audit.md`
-- Include complete approval prompt text
+### 11. Log completion
+- Log timestamp in `aidlc-docs/audit.md` that application design finished (no approval prompt)
 - Use ISO 8601 timestamp format
 
 ### 12. Present Completion Message
@@ -127,10 +125,8 @@ If the analysis in step 8 reveals ANY ambiguous answers, you MUST:
 - Do not wait for a person. Continue.
 - If Units Generation will run, go there next; otherwise go to `inception_end`.
 
-### 14. Record Approval Response
-- Log the user's approval response with timestamp in `aidlc-docs/audit.md`
-- Include the exact user response text
-- Mark the approval status clearly
+### 14. Log stage complete
+- Log in `aidlc-docs/audit.md` that Application Design finished. Do not record a per-stage approval.
 
 ### 15. Update Progress
 - Mark Application Design stage complete in `aidlc-docs/aidlc-state.md`

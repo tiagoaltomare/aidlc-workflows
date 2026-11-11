@@ -1,0 +1,3 @@
+# stories.md
+
+[Answer]: A

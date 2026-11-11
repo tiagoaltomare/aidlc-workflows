@@ -37,18 +37,25 @@ Copy included sources into `docs/` using the markers in
 `scripts/aidlc-validate/README.md`. **Must be absent** from the site tree:
 `audit.md`, `deployment-deploy.md`, question files, raw plans.
 
-### MDX braces
+### MDX braces and `[Answer]:` lines
 
 Docusaurus 3 compiles markdown as MDX. A cell such as `Book {id, title}`
-fails the build (`id is not defined`). When copying markdown into
-`docs-site/`:
+fails the build (`id is not defined`). A line ` [Answer]: A ` is a
+CommonMark **link reference definition** (`[Answer]` → URL `A`) and
+breaks the build when `onBrokenLinks` is `throw`.
+
+When copying markdown into `docs-site/`:
 
 1. Prefer rewriting `{identifier}` as `` `{identifier}` `` or as the
    identifier without braces.
 2. Otherwise escape `{` as `\{` and `}` as `\}` **outside fenced and
    inline code**.
-3. Do not change the source under `aidlc-docs/` unless the catalog itself
-   used braces; the exported copy must be MDX-safe.
+3. Rewrite every line that starts with `[Answer]:` so it is not a link
+   definition, for example `\[Answer\]: A` or wrap the line in backticks
+   or a code fence. Do this in the **exported copy only**.
+4. Do not change the source under `aidlc-docs/` unless the catalog itself
+   used braces; the exported copy must be MDX-safe and must not contain
+   unescaped `[Answer]:` lines.
 
 Run:
 

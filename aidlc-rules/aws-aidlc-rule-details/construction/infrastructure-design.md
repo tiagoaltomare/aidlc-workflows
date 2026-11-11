@@ -50,9 +50,9 @@ Map logical software components to actual infrastructure choices for deployment 
 - Include all [Answer]: tags for user input
 
 ### Step 5: Collect and Analyze Answers
-- Wait for user to complete all [Answer]: tags
-- Review for vague or ambiguous responses
-- Add follow-up questions if needed
+- The agent fills `[Answer]:` tags or copies non-blocking items to `aidlc-docs/assumptions.md`. Do **not** wait for a person.
+- Review filled answers; follow-ups that are non-blocking also go to `assumptions.md`
+- Do not record a per-stage approval
 
 ### Step 6: Generate Infrastructure Design Artifacts
 - Create `aidlc-docs/construction/{unit-name}/infrastructure-design/infrastructure-design.md`
@@ -83,9 +83,8 @@ Map logical software components to actual infrastructure choices for deployment 
 ### Step 8: No stage gate
 - Do not wait. If extensions are active, continue through the rule-mapping steps and then Design Validation.
 
-### Step 9: Record Approval
-- Log approval in audit.md with timestamp
-- Record the user's approval response with timestamp
+### Step 9: Log design complete
+- Log in `aidlc-docs/audit.md` that infrastructure design artifacts are ready. Do not record a per-stage approval.
 
 ### Step 10: Check Extension Status
 - Read Extension Configuration from aidlc-state.md
@@ -139,7 +138,7 @@ B) Select specific journeys: [list numbers]
 ```
 
 ### Step 12: Collect and Record Customer Journey Classification
-- Wait for user to complete [Answer]: tag
+- Fill the `[Answer]:` tag (or copy a non-blocking default to `assumptions.md`). Do **not** wait for a person unless this question is classified blocking.
 - Record answer in `aidlc-docs/construction/plans/{unit-name}-infrastructure-design-plan.md` ([Answer]: tag)
 - Record answer in `aidlc-state.md` under a new `## Customer Journey Configuration` section:
 ```markdown
@@ -176,10 +175,9 @@ B) Select specific journeys: [list numbers]
 - If no questions are needed, skip to Step 16
 
 ### Step 15: Collect and Analyze Answers
-- Wait for user to complete all [Answer]: tags
-- Review for vague or ambiguous responses
-- Add follow-up questions if needed
-- Update the rule mapping file with answers received
+- The agent fills `[Answer]:` tags or copies non-blocking items to `assumptions.md`. Do **not** wait for a person.
+- Update the rule mapping file with those answers
+- Do not record a per-stage approval
 
 ### Step 16: Present Rule Mapping Completion Message
 - Present completion message in this structure:
@@ -205,7 +203,6 @@ B) Select specific journeys: [list numbers]
 ### Step 17: No mapping gate
 - Do not wait here. Attach the rule mapping to the Design Validation report. Escalate only if a hybrid trigger fires (`construction/design-validation.md`).
 
-### Step 18: Record Approval and Update Progress
-- Log approval in audit.md with timestamp
-- Record the user's approval response with timestamp
+### Step 18: Log stage complete
+- Log in `aidlc-docs/audit.md` that Infrastructure Design finished. Do not record a per-stage approval.
 - Mark Infrastructure Design stage complete in aidlc-state.md

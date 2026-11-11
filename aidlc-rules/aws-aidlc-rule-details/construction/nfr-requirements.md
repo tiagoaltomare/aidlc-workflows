@@ -87,12 +87,10 @@ Using the rule × component matrix from Step 2, generate the NFR requirements pl
 - Include all [Answer]: tags for user input
 
 ### Step 6: Collect and Analyze Answers
-- Wait for user to complete all [Answer]: tags
-- **MANDATORY**: Carefully review ALL responses for vague or ambiguous answers
-- **CRITICAL**: Add follow-up questions for ANY unclear responses - do not proceed with ambiguity
-- Look for responses like "depends", "maybe", "not sure", "mix of", "somewhere between", "standard", "typical"
-- Create clarification questions file if ANY ambiguities are detected
-- **Do not proceed until ALL ambiguities are resolved**
+- The agent fills `[Answer]:` tags or copies non-blocking items to `aidlc-docs/assumptions.md`. Do **not** wait for a person.
+- Review filled answers for vague or ambiguous wording; resolve by filling follow-ups or copying to `assumptions.md`
+- Blocking questions still stop (`common/assumptions.md`)
+- Do not record a per-stage approval
 
 ### Step 7: Generate NFR Requirements Artifacts
 - Create `aidlc-docs/construction/{unit-name}/nfr-requirements/nfr-requirements.md`
@@ -122,7 +120,6 @@ Using the rule × component matrix from Step 2, generate the NFR requirements pl
 ### Step 9: No stage gate
 - Do not wait. Continue to NFR Design or Design Validation.
 
-### Step 10: Record Approval and Update Progress
-- Log approval in audit.md with timestamp
-- Record the user's approval response with timestamp
+### Step 10: Log stage complete
+- Log in `aidlc-docs/audit.md` that NFR Requirements finished. Do not record a per-stage approval.
 - Mark NFR Requirements stage complete in aidlc-state.md

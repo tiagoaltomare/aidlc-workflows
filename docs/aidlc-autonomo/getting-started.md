@@ -14,10 +14,12 @@ English is the language of the new rules, the validator, and this guide.
 2. **Copy `aidlc.config.yaml`** into the product root from
    [`docs/aidlc.config.example.yaml`](../aidlc.config.example.yaml). Edit
    `project_type`, `depth`, and `scope.current_path` if needed.
-3. **Point the coding agent at the rules** (this fork's `aidlc-rules/`):
-   the first file to load is `aidlc-rules/aws-aidlc-rules/core-workflow.md`.
-   That file loads `common/welcome-message.md` once, then
-   `common/process-overview.md`, `common/config.md`, and the rest.
+3. **Install the rules into the product repo** (Cursor steps in the next
+   section; other agents:
+   [README Platform-Specific Setup](../../README.md#platform-specific-setup)).
+   The first file the agent loads is `core-workflow.md`. That file loads
+   `common/welcome-message.md` once, then `common/process-overview.md`,
+   `common/config.md`, and the rest from the rule-details directory.
 4. **Install the validator** (from this fork, not from the product):
 
    ```bash
@@ -36,6 +38,56 @@ English is the language of the new rules, the validator, and this guide.
 6. **Answer only named gates and blocking questions.** Non-blocking
    questions are written to a question file and copied to
    `aidlc-docs/assumptions.md`; the run continues.
+
+### Install into a Cursor product repo
+
+From the **product** repository root, with `RULES` pointing at a checkout
+of this fork (`feature/aidlc-autonomo`):
+
+```bash
+RULES=/path/to/aidlc-workflows
+
+mkdir -p .cursor/rules
+cat > .cursor/rules/ai-dlc-workflow.mdc << 'EOF'
+---
+description: "AI-DLC (AI-Driven Development Life Cycle) adaptive workflow for software development"
+alwaysApply: true
+---
+
+EOF
+cat "$RULES/aidlc-rules/aws-aidlc-rules/core-workflow.md" >> .cursor/rules/ai-dlc-workflow.mdc
+
+mkdir -p .aidlc-rule-details
+cp -R "$RULES/aidlc-rules/aws-aidlc-rule-details/"* .aidlc-rule-details/
+```
+
+- **`.cursor/rules/ai-dlc-workflow.mdc`** — Cursor always-apply rule. It
+  is `core-workflow.md` with YAML frontmatter.
+- **`.aidlc-rule-details/`** — stage files (`common/`, `inception/`,
+  `construction/`, `operations/`, `extensions/`). `core-workflow.md`
+  resolves this path.
+
+**AGENTS.md pointer** (optional, in addition to or instead of the
+`.mdc` file). Keep or merge with `common/agents-md.md` if a scaffold
+would overwrite it:
+
+```bash
+cp "$RULES/aidlc-rules/aws-aidlc-rules/core-workflow.md" ./AGENTS.md
+```
+
+Or a short pointer at the top of `AGENTS.md`:
+
+```markdown
+# AGENTS.md
+
+This project uses AI-DLC. For software development work, load and follow
+`.cursor/rules/ai-dlc-workflow.mdc` (or `core-workflow.md`). Rule details
+are in `.aidlc-rule-details/`.
+```
+
+Kiro, Amazon Q, Cline, Claude Code, GitHub Copilot, and Codex: same
+`aws-aidlc-rule-details/` copy, different host file. Follow
+[README Platform-Specific Setup](../../README.md#platform-specific-setup).
 
 ### Named gates
 
@@ -63,10 +115,10 @@ English is the language of the new rules, the validator, and this guide.
 
 ### Depth
 
-`depth: minimal` still requires the **complete Vision structure** (every
-required section). Minimal means shorter prose per section, not omitted
-sections. Same idea for other stages: all defined artifacts, adaptive
-detail.
+`depth: minimal` for Vision is a **short section list** (executive
+summary, FEAT- list, cycle-cut pointer). `standard` and `comprehensive`
+use the full Vision sections. See `create-vision.md`. Other stages still
+create all defined artifacts; detail inside them follows depth.
 
 ### Units
 

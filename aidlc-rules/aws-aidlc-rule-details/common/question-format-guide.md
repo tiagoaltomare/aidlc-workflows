@@ -283,7 +283,7 @@ D) [Clear option 4]
 1. **Detect**: Analyze all responses for contradictions/ambiguities
 2. **Create**: Generate clarification question file if issues found
 3. **Inform**: Tell user about the issues and clarification file
-4. **Wait**: Do not proceed until user provides clarifications
+4. **Wait only if blocking or a named gate.** Otherwise copy to `assumptions.md` and continue. The agent MAY fill `[Answer]:` tags.
 5. **Re-validate**: After clarifications, check again for consistency
 6. **Proceed**: Only move forward when all contradictions are resolved
 

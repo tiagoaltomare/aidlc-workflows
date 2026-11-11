@@ -5,6 +5,11 @@ The export stage **generates** these files in the product
 from the rules fork `templates/` directory at runtime. If `package.json`
 already exists there, skip generation and only refresh exported markdown.
 
+When filling `docs/` from cycle artifacts, follow
+`docusaurus-export.md`: escape `{identifier}` for MDX and rewrite
+`[Answer]:` lines (for example `\[Answer\]: A`) so they are not CommonMark
+link reference definitions.
+
 Set `i18n.defaultLocale` to `operations.docs.language` (default `en`).
 
 ## `package.json`

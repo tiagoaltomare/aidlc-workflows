@@ -168,7 +168,7 @@ A single unit for the whole application is valid. Traceability needs the DAG and
 - Infrastructure already defined
 - NFR Implementation skipped AND no new deployable resources
 
-This stage is **not** folded into NFR. Record EXECUTE or SKIP here. Code Generation still writes an N/A extension mapping when this stage is skipped and extensions are inactive.
+This stage is **not** folded into NFR. Record EXECUTE or SKIP here. When this stage is skipped, or no extension is opted IN, Code Generation writes **no** extension mapping file.
 
 ### 3.6 Operations (Rules Validation + Deployment + Post-Deployment Testing) - Execute IF:
 - Requirements will drive the creation of resources that could be subject to extension rules (e.g. observability, recovery, deployment, runbooks)
