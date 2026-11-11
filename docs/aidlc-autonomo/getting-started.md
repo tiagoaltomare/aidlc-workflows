@@ -61,11 +61,15 @@ mkdir -p .aidlc-rule-details
 cp -R "$RULES/aidlc-rules/aws-aidlc-rule-details/"* .aidlc-rule-details/
 ```
 
+Commit `.aidlc-rule-details/` with the product. Check the product
+`.gitignore` does not ignore that path; if it does, remove the ignore line
+so the copied rules are versioned.
+
 - **`.cursor/rules/ai-dlc-workflow.mdc`** — Cursor always-apply rule. It
   is `core-workflow.md` with YAML frontmatter.
 - **`.aidlc-rule-details/`** — stage files (`common/`, `inception/`,
   `construction/`, `operations/`, `extensions/`). `core-workflow.md`
-  resolves this path.
+  resolves this path. Commit this directory.
 
 **AGENTS.md pointer** (optional, in addition to or instead of the
 `.mdc` file). Keep or merge with `common/agents-md.md` if a scaffold
@@ -117,8 +121,10 @@ Kiro, Amazon Q, Cline, Claude Code, GitHub Copilot, and Codex: same
 
 `depth: minimal` for Vision is a **short section list** (executive
 summary, FEAT- list, cycle-cut pointer). `standard` and `comprehensive`
-use the full Vision sections. See `create-vision.md`. Other stages still
-create all defined artifacts; detail inside them follows depth.
+use the full Vision sections. See `create-vision.md`. A strangler
+migration uses that same `minimal` / `standard` / `comprehensive` choice;
+it does not add a fourth depth. Other stages still create all defined
+artifacts; detail inside them follows depth.
 
 ### Units
 

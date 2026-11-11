@@ -135,33 +135,9 @@ Extensions with no `## Opt-In Prompt` and no `## Question` and not named `*.opt-
 
 **Execution**:
 1. **MANDATORY**: You MUST log start of Operations Retrofit in audit.md
-2. **MANDATORY**: You MUST record all steps in `aidlc-docs/step-decision-log.md` before executing any of them.
-3. You MUST present the following question to the user: "**Operations extensions are available but were not included when this project was built. Would you like to retrofit the Operations phase? (Yes/No)**"
-4. **Wait for Explicit Approval**: DO NOT PROCEED until user confirms
-5. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
-
-**Skip IF** the user says No:
-- You MUST record stage status as SKIPPED in `aidlc-docs/aidlc-state.md`
-- Present: "Operations Retrofit SKIPPED — user declined."
-- You MUST NOT execute any further steps in this stage. Proceed to Reverse Engineering.
-
-**Execute IF** the user says Yes: Proceed to Step 6.
-
-6. You MUST archive current state:
-   - You MUST create `aidlc-docs/operations/retrofit-archive/`
-   - You MUST copy `aidlc-docs/aidlc-state.md` to `aidlc-docs/operations/retrofit-archive/aidlc-state.md`
-   - You MUST copy `aidlc-docs/audit.md` to `aidlc-docs/operations/retrofit-archive/audit.md`
-   - You MUST NOT delete, move, or regenerate `aidlc-docs/vision/`. A retrofit must not wipe a versioned Vision, Tech Env, feature catalog, or scopes.
-7. You MUST reset aidlc-state.md:
-   - **SET**: Project Type to `Brownfield (Operations Retrofit)`
-   - **KEEP**: Project Information (except Project Type), Workspace State, Code Location Rules, Architectural Decisions
-   - **CLEAR**: Extension Configuration table. You MUST leave the section header and empty table columns intact.
-   - **CLEAR**: Build and Test Results
-   - **RESET**: Stage Progress. You MUST mark Requirements Analysis and all subsequent stages as NOT COMPLETED (`[ ]`). You MUST keep Workspace Detection and Operations Retrofit as `[x]`.
-   - **SET**: Current Stage to `INCEPTION - Requirements Analysis`
-   - **MANDATORY**: You MUST re-read aidlc-state.md and confirm: (1) Extension Configuration table has the header row but NO data rows, (2) Current Stage is `INCEPTION - Requirements Analysis`, (3) Requirements Analysis and all subsequent stages show `[ ]`, (4) `aidlc-docs/operations/retrofit-archive/aidlc-state.md` exists. You MUST NOT proceed to Step 8 until all 4 checks pass.
-8. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-9. You MUST automatically proceed to Create Vision, Tech Env, Features and Scopes (reuse_if_present; do not wipe `aidlc-docs/vision/`). Do not enter Requirements Analysis until `vision_scope` is approved.
+2. Load all steps from `inception/operations-retrofit.md`
+3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
+4. Execute those steps (opt-in question, skip or archive/reset, then Vision composite). Do not enter Requirements Analysis until `vision_scope` is approved.
 
 ## Reverse Engineering (CONDITIONAL - Brownfield Only)
 

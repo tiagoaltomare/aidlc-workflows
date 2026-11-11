@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import json
+import shutil
 from pathlib import Path
 
-from aidlc_validate.cli import main
+import pytest
+import yaml
+
+from aidlc_validate.cli import CHECK_FNS, main
+from aidlc_validate.checks import SCHEMA_PATH, load_config
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
@@ -118,11 +124,22 @@ def test_stories_too_few_ac_fails():
 
 
 def _copy_valid(tmp_path: Path) -> Path:
-    import shutil
-
     dest = tmp_path / "repo"
     shutil.copytree(FIXTURES / "valid", dest)
     return dest
+
+
+def _update_config(repo: Path, **updates: object) -> None:
+    path = repo / "aidlc.config.yaml"
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    for key, value in updates.items():
+        if isinstance(value, dict) and isinstance(data.get(key), dict):
+            merged = dict(data[key])
+            merged.update(value)
+            data[key] = merged
+        else:
+            data[key] = value
+    path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
 
 
 def test_scope_atual_alias_only_passes(tmp_path: Path):
@@ -281,6 +298,186 @@ def test_assumptions_bad_format_fails():
     rc, _out, err = _run("assumptions", FIXTURES / "assumptions_bad_format")
     assert rc == 1
     assert "missing required columns" in err
+
+
+def test_schema_check_ids_match_cli():
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    enum = schema["properties"]["gates"]["properties"]["checks"]["items"]["properties"][
+        "id"
+    ]["enum"]
+    assert set(enum) == set(CHECK_FNS)
+
+
+def test_unknown_check_id_fails_config(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    _update_config(
+        repo,
+        gates={"checks": [{"id": "nope", "severity": "blocking"}]},
+    )
+    rc, _out, err = _run("config", repo)
+    assert rc == 1
+    assert "schema error" in err
+    assert "nope" in err
+    rc, _out, err = _run("stories", repo)
+    assert rc == 1
+    assert "nope" in err
+
+
+def test_omitted_check_is_skipped(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    stories = repo / "aidlc-docs" / "inception" / "user-stories" / "stories.md"
+    stories.write_text(
+        "# Stories\n\n### US-001 Checkout a book\n"
+        "As a member, I want to check out a book so that I can read it.\n",
+        encoding="utf-8",
+    )
+    _update_config(
+        repo,
+        gates={"checks": [{"id": "config", "severity": "blocking"}]},
+    )
+    rc, out, err = _run("stories", repo)
+    assert rc == 0, err
+    assert "stories: skipped" in out
+    rc, _out, err = _run("stories", FIXTURES / "too_few_ac")
+    assert rc == 1
+
+
+def test_advisory_check_exits_zero_with_findings(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    shutil.copytree(FIXTURES / "too_few_ac" / "aidlc-docs", repo / "aidlc-docs", dirs_exist_ok=True)
+    _update_config(
+        repo,
+        gates={"checks": [{"id": "stories", "severity": "advisory"}]},
+    )
+    rc, out, err = _run("stories", repo)
+    assert rc == 0
+    assert "min is 2" in err
+    assert "stories: advisory" in out
+
+
+def test_max_acceptance_criteria_from_config(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    _update_config(repo, stories={"min_acceptance_criteria": 1, "max_size": {"max_acceptance_criteria": 1}})
+    rc, _out, err = _run("stories", repo)
+    assert rc == 1
+    assert "max is 1" in err
+
+
+def test_stories_count_scenarios_not_gherkin_lines(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    stories = repo / "aidlc-docs" / "inception" / "user-stories" / "stories.md"
+    stories.write_text(
+        "# Stories\n\n"
+        "### US-001 Checkout a book\n"
+        "As a member, I want to check out a book so that I can read it.\n"
+        "Requirement: REQ-001\n\n"
+        "**Acceptance Criteria:**\n\n"
+        "Scenario: happy path\n"
+        "- Given I am a registered member\n"
+        "- When I checkout an available book\n"
+        "- Then the loan is created\n\n"
+        "Scenario: already on loan\n"
+        "- Given the book is already on loan\n"
+        "- When I checkout that book\n"
+        "- Then I see it is unavailable\n",
+        encoding="utf-8",
+    )
+    _update_config(
+        repo,
+        stories={"min_acceptance_criteria": 2, "max_size": {"max_acceptance_criteria": 5}},
+    )
+    rc, out, err = _run("stories", repo)
+    assert rc == 0, err
+    assert "stories: pass" in out
+
+
+def test_max_stories_per_unit_from_config(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    story_map = (
+        repo / "aidlc-docs" / "inception" / "application-design" / "unit-of-work-story-map.md"
+    )
+    story_map.write_text(
+        "# Story map\n\n"
+        "| story  | unit     |\n"
+        "| ------ | -------- |\n"
+        "| US-001 | UNIT-001 |\n"
+        "| US-002 | UNIT-001 |\n"
+        "| US-002 | UNIT-002 |\n",
+        encoding="utf-8",
+    )
+    _update_config(repo, units={"max_stories_per_unit": 1, "parallelism": "sequential"})
+    rc, _out, err = _run("traceability", repo)
+    assert rc == 1
+    assert "UNIT-001 has 2 stories" in err
+    assert "max_stories_per_unit is 1" in err
+
+
+def test_load_config_applies_design_validation_and_limits_defaults(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    cfg, errors = load_config(repo)
+    assert errors == []
+    assert cfg is not None
+    assert cfg["design_validation"]["mode"] == "hybrid"
+    assert cfg["limits"]["max_rework_iterations_per_unit"] == 3
+    assert cfg["units"]["max_stories_per_unit"] == 8
+
+
+def test_export_questions_filename_fails_gate_filename_passes(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    docs = repo / "docs-site" / "docs"
+    (docs / "construction").mkdir(exist_ok=True)
+    (docs / "construction" / "design-validation-gate.md").write_text(
+        "# Design validation gate\n\nEscalate?\n", encoding="utf-8"
+    )
+    rc, out, err = _run("export", repo)
+    assert rc == 0, err
+    assert "export: pass" in out
+    (docs / "design-questions.md").write_text("# Questions\n", encoding="utf-8")
+    rc, _out, err = _run("export", repo)
+    assert rc == 1
+    assert "question files" in err
+    assert "design-questions.md" in err
+
+
+def _write_stub_package_json(site: Path, exit_code: int) -> None:
+    (site / "package.json").write_text(
+        json.dumps({"scripts": {"build": f"node -e \"process.exit({exit_code})\""}}),
+        encoding="utf-8",
+    )
+
+
+@pytest.mark.skipif(
+    not shutil.which("npm") or not shutil.which("node"),
+    reason="npm/node required to prove Docusaurus build",
+)
+def test_export_prove_build_runs_npm_when_package_json_present(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    _write_stub_package_json(repo / "docs-site", 0)
+    rc, out, err = _run("export", repo)
+    assert rc == 0, err
+    assert "export: pass" in out
+    _write_stub_package_json(repo / "docs-site", 1)
+    rc, _out, err = _run("export", repo)
+    assert rc == 1
+    assert "npm run build failed" in err
+
+
+def test_export_prove_build_flag_true_without_package_json_fails(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    _update_config(repo, operations={"prove_build": True, "docusaurus_path": "docs-site"})
+    rc, _out, err = _run("export", repo)
+    assert rc == 1
+    assert "prove_build is true" in err
+    assert "package.json" in err
+
+
+def test_export_prove_build_false_skips_failing_script(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    _write_stub_package_json(repo / "docs-site", 1)
+    _update_config(repo, operations={"prove_build": False, "docusaurus_path": "docs-site"})
+    rc, out, err = _run("export", repo)
+    assert rc == 0, err
+    assert "export: pass" in out
 
 
 def test_assumptions_duplicate_id_fails(tmp_path: Path):

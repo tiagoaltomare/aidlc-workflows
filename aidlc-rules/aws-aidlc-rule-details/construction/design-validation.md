@@ -31,8 +31,10 @@ run, that is trigger `no_executable_check`.
 Escalate and **wait** (**named gate `design_validation`**) when any of these
 is true (from `design_validation.human_triggers`, defaults below). Write the
 gate question to `aidlc-docs/construction/{unit}/design-validation-gate.md`
-and present it in the assistant turn. This gate is one of the named
-checkpoints in `welcome-message.md` / `process-overview.md`, including when
+and present it in the assistant turn. That filename is a gate file, not a
+`*questions*.md` file, so Docusaurus export does not treat it as an excluded
+question file. This gate is one of the named checkpoints in
+`welcome-message.md` / `process-overview.md`, including when
 `public_contract` fires because this cycle changes a published API.
 
 - `persistent_data` — unit writes durable data

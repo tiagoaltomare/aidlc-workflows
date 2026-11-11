@@ -758,7 +758,7 @@ Automated testing and reporting framework for validating changes to AI-DLC workf
 ```bash
 cd scripts/aidlc-evaluator
 uv sync
-uv run python run.py test
+uv run python3 run.py test
 ```
 
 **Documentation:** See [scripts/aidlc-evaluator/README.md](scripts/aidlc-evaluator/README.md)
@@ -908,6 +908,10 @@ AGENTS.md
 .github/copilot-instructions.md
 .aidlc-rule-details/
 ```
+
+Commit `.aidlc-rule-details/` (and the host copies listed above). Check the
+product `.gitignore` does not ignore that directory; if it does, remove that
+line so the installed rules are versioned.
 
 **Optional - Add to `.gitignore` (if needed):**
 

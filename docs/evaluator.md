@@ -117,7 +117,7 @@ The evaluator is run the same way as upstream — see `scripts/aidlc-evaluator/R
 By default, the executor cannot deploy to AWS because the Docker sandbox has no credentials. To enable Deployment and Post-Deployment Testing stages, set `INJECT_AWS_CREDENTIALS=true` before starting the run:
 
 ```bash
-INJECT_AWS_CREDENTIALS=true AWS_PROFILE=<your-profile> uv run python run.py full \
+INJECT_AWS_CREDENTIALS=true AWS_PROFILE=<your-profile> uv run python3 run.py full \
     --vision <test-case>/vision.md \
     --tech-env <test-case>/tech-env.md
 ```
@@ -133,7 +133,7 @@ Without it, the workflow completes after Rules Validation — Deployment and Pos
 Runs take hours. Prevent macOS sleep:
 
 ```bash
-caffeinate -ims uv run python run.py full ...
+caffeinate -ims uv run python3 run.py full ...
 ```
 
 ### Parallel runs with worktrees
@@ -143,7 +143,7 @@ Use a git worktree to run the evaluator while continuing to edit:
 ```bash
 git worktree add ~/repos/aidlc-evaluator test/<your-branch>
 cd ~/repos/aidlc-evaluator/scripts/aidlc-evaluator
-AWS_PROFILE=<profile> uv run python run.py full ...
+AWS_PROFILE=<profile> uv run python3 run.py full ...
 ```
 
 Remove when done: `git worktree remove ~/repos/aidlc-evaluator`

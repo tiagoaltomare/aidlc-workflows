@@ -27,6 +27,14 @@ Install from this directory (`pip install -e .`) or set `PYTHONPATH` to
 | `stories`         | `aidlc-docs/inception/user-stories/stories.md` plus `stories.*` in the config (As a / I want, min/max AC)                                                                                                                                             |
 | `assumptions`     | `aidlc-docs/assumptions.md` table (`id`, `stage`, `blocking`, `question`, `assumption_or_answer`, `status`); fails on missing file, malformed rows, or blocking rows that are not `answered`                                                          |
 
+`export` also runs `npm run build` in the docs-site folder when
+`package.json` is present, or when `operations.prove_build` is `true`.
+Set `prove_build: false` to skip that build. Missing node/npm when the
+build is required is a failure.
+
+`gates.checks` in `aidlc.config.yaml` is a whitelist of these check ids.
+An omitted id is skipped. `severity: advisory` prints findings and exits 0.
+
 ## ID conventions
 
 Stable prefixes. Body is uppercase alphanumeric segments separated by `-`.
@@ -128,5 +136,6 @@ anywhere under the docs-site folder:
 | `post_deployment_test_report` | `post-deployment-test-report.md` |
 
 Excluded names that must be **absent**: `audit.md`, `deployment-deploy.md`,
-any markdown whose name contains `question`, and raw plans (`*plan*.md` or
-files under a `plans/` directory).
+any markdown whose name contains `questions` (for example `*-questions.md`;
+`design-validation-gate.md` is not a question file), and raw plans
+(`*plan*.md` or files under a `plans/` directory).

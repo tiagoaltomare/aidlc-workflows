@@ -56,8 +56,19 @@ On a passing check:
 1. Read the YAML.
 2. Apply schema defaults that the file omitted:
    - `design_validation.mode` = `hybrid`
+   - `design_validation.human_triggers` = the seven built-in triggers
+   - `design_validation.separate_llm_reviewer` = `true`
+   - `limits.max_rework_iterations_per_unit` = `3`
+   - `limits.token_budget_per_unit` = `200000`
+   - `limits.on_token_budget_exceeded` = `pause_and_ask_human`
+   - `units.max_stories_per_unit` = `8`
    - `operations.docs.language` = `en`
-3. Keep the values for later stages. Do not treat the config as a reason to
+3. Honor `gates.checks`: each `id` is a validator subcommand (`config`,
+   `scope-in-vision`, `traceability`, `stories`, `units-dag`, `assumptions`,
+   `export`). If the list is present, omitted ids are disabled. Unknown ids
+   fail the config check. `severity: advisory` records findings without
+   failing the command.
+4. Keep the values for later stages. Do not treat the config as a reason to
    skip a recorded human gate (`reverse_engineering`, `vision_scope`,
    `inception_end`, `design_validation`, `build_and_test`, Operations
    checkpoints, Deployment opt-in, or `operations`).

@@ -96,6 +96,7 @@ Acceptable justifications reference specific facts, for example:
 - `construction/build-and-test.md`
 - `inception/requirements-analysis.md`
 - `inception/workspace-detection.md`
+- `inception/operations-retrofit.md`
 - `operations/rules-validation.md`
 
 ## What This Does NOT Apply To

@@ -18,6 +18,9 @@
   - `requirements-questions.md`
   - `story-planning-questions.md`
   - `design-questions.md`
+- Named-gate files are `{gate-name}-gate.md` (example:
+  `design-validation-gate.md`). Do **not** name them `*questions*.md`. Export
+  excludes markdown whose filename contains `questions` (plural).
 
 #### Question Structure
 Every question must include meaningful options plus "Other" as the last option:

@@ -38,10 +38,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not root.is_dir():
         print(f"error: product root does not exist: {root}", file=sys.stderr)
         return 2
+    policy, cfg_errors = checks.check_gate_policy(root, args.check)
+    if cfg_errors:
+        for err in cfg_errors:
+            print(err, file=sys.stderr)
+        return 1
+    if policy == "skipped":
+        print(f"{args.check}: skipped")
+        return 0
     errors = CHECK_FNS[args.check](root)
     if errors:
         for err in errors:
             print(err, file=sys.stderr)
+        if policy == "advisory":
+            print(f"{args.check}: advisory")
+            return 0
         return 1
     print(f"{args.check}: pass")
     return 0

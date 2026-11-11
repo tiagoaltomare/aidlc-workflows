@@ -94,7 +94,18 @@
             "required": ["id", "severity"],
             "additionalProperties": false,
             "properties": {
-              "id": { "type": "string", "minLength": 1 },
+              "id": {
+                "type": "string",
+                "enum": [
+                  "assumptions",
+                  "config",
+                  "export",
+                  "scope-in-vision",
+                  "stories",
+                  "traceability",
+                  "units-dag"
+                ]
+              },
               "severity": { "type": "string", "enum": ["blocking", "advisory"] }
             }
           }
@@ -146,6 +157,7 @@
       "properties": {
         "docusaurus_path": { "type": "string", "minLength": 1 },
         "export_default": { "type": "boolean" },
+        "prove_build": { "type": "boolean" },
         "docs": {
           "type": "object",
           "additionalProperties": false,

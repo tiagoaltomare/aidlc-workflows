@@ -29,13 +29,18 @@ fork at runtime. That tree is a CI fixture in this fork only. The product
 site is generated here.
 
 Then `npm install` and `npm run build` in that folder. A failing build is
-blocking.
+blocking. The `export` validator proves that build when
+`docs-site/package.json` exists, or when `operations.prove_build` is `true`
+(fails clearly if node/npm or `package.json` is missing). Set
+`operations.prove_build: false` to skip the build check.
 
 ## Include / exclude
 
 Copy included sources into `docs/` using the markers in
 `scripts/aidlc-validate/README.md`. **Must be absent** from the site tree:
-`audit.md`, `deployment-deploy.md`, question files, raw plans.
+`audit.md`, `deployment-deploy.md`, question files (`*questions*.md` —
+filename contains `questions`), raw plans. Named-gate files such as
+`design-validation-gate.md` are not question files.
 
 ### MDX braces and `[Answer]:` lines
 

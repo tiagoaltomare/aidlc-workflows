@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 import jsonschema
@@ -41,7 +44,21 @@ INCLUDE_MARKERS = {
 DEFAULT_INCLUDE = list(INCLUDE_MARKERS)
 DEFAULT_EXCLUDE = ["audit", "question_files", "raw_plans", "deployment_deploy_log"]
 
-QUESTION_NAME_RE = re.compile(r"question", re.I)
+QUESTION_NAME_RE = re.compile(r"questions", re.I)
+DEFAULT_HUMAN_TRIGGERS = [
+    "persistent_data",
+    "security",
+    "public_contract",
+    "external_integration",
+    "risk_high_or_critical",
+    "rework_limit_exceeded",
+    "no_executable_check",
+]
+DEFAULT_LIMITS = {
+    "max_rework_iterations_per_unit": 3,
+    "token_budget_per_unit": 200000,
+    "on_token_budget_exceeded": "pause_and_ask_human",
+}
 PLAN_NAME_RE = re.compile(r"(?:^|[-_])plan(?:s)?(?:[-_.]|$)|-plan\.md$", re.I)
 
 SCHEMA_PATH = (
@@ -138,14 +155,64 @@ def load_config(root: Path) -> tuple[dict | None, list[str]]:
             loc = ".".join(str(p) for p in err.path) or "(root)"
             messages.append(f"config: schema error at {loc}: {err.message}")
         return None, messages
-    data.setdefault("design_validation", {}).setdefault("mode", "hybrid")
-    data.setdefault("operations", {}).setdefault("docs", {}).setdefault("language", "en")
+    dv = data.get("design_validation")
+    if not isinstance(dv, dict):
+        dv = {}
+        data["design_validation"] = dv
+    dv.setdefault("mode", "hybrid")
+    dv.setdefault("human_triggers", list(DEFAULT_HUMAN_TRIGGERS))
+    dv.setdefault("separate_llm_reviewer", True)
+
+    limits = data.get("limits")
+    if not isinstance(limits, dict):
+        limits = {}
+        data["limits"] = limits
+    for key, value in DEFAULT_LIMITS.items():
+        limits.setdefault(key, value)
+
+    units = data.get("units")
+    if not isinstance(units, dict):
+        units = {}
+        data["units"] = units
+    units.setdefault("max_stories_per_unit", 8)
+
+    ops = data.get("operations")
+    if not isinstance(ops, dict):
+        ops = {}
+        data["operations"] = ops
+    docs = ops.get("docs")
+    if not isinstance(docs, dict):
+        docs = {}
+        ops["docs"] = docs
+    docs.setdefault("language", "en")
     return data, []
 
 
 def check_config(root: Path) -> list[str]:
     _cfg, errors = load_config(root)
     return errors
+
+
+def check_gate_policy(root: Path, check_id: str) -> tuple[str, list[str]]:
+    """How to treat this check: blocking, advisory, or skipped.
+
+    Missing ``gates.checks`` means every known check is blocking (run).
+    A present list is a whitelist: omitted ids are skipped (disabled).
+    Invalid config is always a blocking error so an unknown id cannot hide.
+    """
+    path = root / "aidlc.config.yaml"
+    if not path.is_file():
+        return "blocking", []
+    _cfg, errors = load_config(root)
+    if errors:
+        return "blocking", errors
+    listed = (_cfg.get("gates") or {}).get("checks")
+    if not listed:
+        return "blocking", []
+    for item in listed:
+        if item.get("id") == check_id:
+            return str(item.get("severity") or "blocking"), []
+    return "skipped", []
 
 
 def _declared_units(root: Path) -> set[str]:
@@ -466,6 +533,7 @@ def check_traceability(root: Path) -> list[str]:
         tables = parse_markdown_tables(map_text)
         assigned_stories: set[str] = set()
         units_with_stories: set[str] = set()
+        stories_per_unit: Counter[str] = Counter()
         for table in tables:
             for row in table:
                 story_cell = row.get("story") or row.get("stories") or ""
@@ -475,6 +543,8 @@ def check_traceability(root: Path) -> list[str]:
                 assigned_stories.update(stories)
                 if stories:
                     units_with_stories.update(units)
+                    for unit in units:
+                        stories_per_unit[unit] += len(stories)
         if stories_exist:
             for us in story_ids:
                 if us not in assigned_stories:
@@ -484,6 +554,16 @@ def check_traceability(root: Path) -> list[str]:
         for unit in declared:
             if stories_exist and unit not in units_with_stories:
                 errors.append(f"traceability: {unit} has no stories")
+        cfg, _cfg_errors = load_config(root)
+        max_stories = 8
+        if cfg is not None:
+            max_stories = int((cfg.get("units") or {}).get("max_stories_per_unit") or 8)
+        for unit, n in stories_per_unit.items():
+            if n > max_stories:
+                errors.append(
+                    f"traceability: {unit} has {n} stories; "
+                    f"max_stories_per_unit is {max_stories}"
+                )
     elif stories_exist:
         errors.append(f"traceability: missing {STORY_MAP_PATH}")
 
@@ -569,7 +649,46 @@ def check_export(root: Path) -> list[str]:
                 f"export: unescaped [Answer]: line in {rel} "
                 r"(rewrite as \[Answer\]: or wrap so it is not a link reference)"
             )
+    errors.extend(_prove_docusaurus_build(site, ops))
     return errors
+
+
+def _prove_docusaurus_build(site: Path, ops: dict) -> list[str]:
+    """Run ``npm run build`` when the site has a package.json, or when asked."""
+    prove = ops.get("prove_build")
+    pkg = site / "package.json"
+    has_pkg = pkg.is_file()
+    if prove is False:
+        return []
+    if prove is None and not has_pkg:
+        return []
+    site_name = site.name
+    if prove is True and not has_pkg:
+        return [f"export: prove_build is true but {site_name}/package.json is missing"]
+    npm = shutil.which("npm")
+    node = shutil.which("node")
+    if not npm or not node:
+        return [
+            "export: Docusaurus build required "
+            "(operations.prove_build or docs-site/package.json) "
+            "but node/npm is not available"
+        ]
+    try:
+        proc = subprocess.run(
+            [npm, "run", "build"],
+            cwd=site,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+    except subprocess.TimeoutExpired:
+        return ["export: npm run build timed out"]
+    if proc.returncode == 0:
+        return []
+    detail = (proc.stderr or proc.stdout or "").strip().splitlines()
+    tail = "\n".join(detail[-5:]) if detail else ""
+    extra = f"\n{tail}" if tail else ""
+    return [f"export: npm run build failed (exit {proc.returncode}){extra}"]
 
 
 def check_assumptions(root: Path) -> list[str]:
@@ -645,29 +764,13 @@ def check_stories(root: Path) -> list[str]:
     blocks = re.split(r"(?=^#{1,6}\s+US-)", text, flags=re.M)
     errors: list[str] = []
     found = 0
-    ac_line = re.compile(
-        r"^\s*(?:[-*] )?(?:Given|When|Then|And)\b", re.I
-    )
     for block in blocks:
         ids = _heading_ids("US", block) or _ids("US", block.splitlines()[0] if block else "")
         if not ids:
             continue
         us = ids[0]
         found += 1
-        ac_count = sum(1 for line in block.splitlines() if ac_line.match(line))
-        if ac_count == 0:
-            # Fall back to list items under an Acceptance Criteria heading.
-            in_ac = False
-            for line in block.splitlines():
-                if re.match(r"^#{1,6}\s+.*acceptance", line, re.I) or re.match(
-                    r"^\s*\*\*acceptance criteria", line, re.I
-                ):
-                    in_ac = True
-                    continue
-                if in_ac and re.match(r"^#{1,6}\s+", line):
-                    in_ac = False
-                if in_ac and re.match(r"^\s*[-*]\s+\S", line):
-                    ac_count += 1
+        ac_count = _acceptance_criteria_count(block)
         if ac_count < min_ac:
             errors.append(
                 f"stories: {us} has {ac_count} acceptance criteria; min is {min_ac}"
@@ -685,3 +788,35 @@ def check_stories(root: Path) -> list[str]:
     if found == 0:
         errors.append(f"stories: no US- headings in {STORIES_PATH}")
     return errors
+
+
+_SCENARIO_RE = re.compile(r"^\s*(?:#{1,6}\s+)?scenario(?:\s|:)", re.I)
+_GIVEN_RE = re.compile(r"^\s*(?:[-*] )?(?:\*\*)?given\b", re.I)
+_AC_HEADING_RE = re.compile(r"^#{1,6}\s+.*acceptance", re.I)
+_AC_BOLD_RE = re.compile(r"^\s*\*\*acceptance criteria", re.I)
+_LIST_ITEM_RE = re.compile(r"^\s*[-*]\s+\S")
+_GHERKIN_RE = re.compile(
+    r"^\s*(?:[-*] )?(?:\*\*)?(?:given|when|then|and|but)\b", re.I
+)
+
+
+def _acceptance_criteria_count(block: str) -> int:
+    """Count scenarios (criteria), not every Given/When/Then line."""
+    lines = block.splitlines()
+    n_scenario = sum(1 for line in lines if _SCENARIO_RE.match(line))
+    if n_scenario:
+        return n_scenario
+    n_given = sum(1 for line in lines if _GIVEN_RE.match(line))
+    if n_given:
+        return n_given
+    in_ac = False
+    n = 0
+    for line in lines:
+        if _AC_HEADING_RE.match(line) or _AC_BOLD_RE.match(line):
+            in_ac = True
+            continue
+        if in_ac and re.match(r"^#{1,6}\s+", line):
+            in_ac = False
+        if in_ac and _LIST_ITEM_RE.match(line) and not _GHERKIN_RE.match(line):
+            n += 1
+    return n
