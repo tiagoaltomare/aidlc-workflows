@@ -302,10 +302,18 @@ Update `aidlc-docs/aidlc-state.md`:
 > **You may:**
 >
 > 🔧 **Request Changes** - Ask for modifications to the reverse engineering analysis if required
-> ✅ **Approve & Continue** - Approve analysis and proceed to **Requirements Analysis**
+> ✅ **Approve & Continue** - Approve analysis and proceed to **Create Vision, Tech Env, Features and Scopes**
 ```
 
-## Step 13: Wait for User Approval
+## Step 13: Wait for User Approval (gate `reverse_engineering`)
 
 - **MANDATORY**: Do not proceed until user explicitly approves
 - **MANDATORY**: Log user's response in audit.md with complete raw input
+- After approval, next stage is the composite Vision / Tech Env / catalog / scopes stage, not Requirements Analysis
+
+## Feature-catalog inputs
+
+When writing Reverse Engineering artifacts, include enough entry-point,
+component, data, and test evidence for `inception/feature-catalog.md`
+(routes, endpoints, commands, jobs, consumers). Do not skip this because a
+later stage will need it.

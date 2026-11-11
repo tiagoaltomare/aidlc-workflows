@@ -30,14 +30,14 @@ Check if `aidlc-docs/aidlc-state.md` exists:
 
 **IF workspace is empty (no existing code)**:
 - Set flag: `brownfield = false`
-- Next phase: Requirements Analysis
+- Next phase: Create Vision, Tech Env, Features and Scopes
 
 **IF workspace has existing code**:
 - Set flag: `brownfield = true`
 - Check for existing reverse engineering artifacts in `aidlc-docs/inception/reverse-engineering/`
 - **IF reverse engineering artifacts exist**:
     - Check if artifacts are stale (compare artifact timestamps against codebase's last significant modification)
-    - **IF artifacts are current**: Load them, skip to Requirements Analysis
+    - **IF artifacts are current**: Load them, skip Reverse Engineering, next phase is Create Vision, Tech Env, Features and Scopes
     - **IF artifacts are stale**: Next phase is Reverse Engineering (rerun to refresh artifacts)
     - **IF user explicitly requests rerun**: Next phase is Reverse Engineering regardless of staleness
 - **IF no reverse engineering artifacts**: Next phase is Reverse Engineering
@@ -86,12 +86,12 @@ Workspace analysis findings:
 
 Workspace analysis findings:
 • **Project Type**: Greenfield project
-• **Next Step**: Proceeding to **Requirements Analysis**...
+• **Next Step**: Proceeding to **Create Vision, Tech Env, Features and Scopes**...
 ```
 
 ## Step 6: Automatically Proceed
 
 - **No user approval required** - this is informational only
 - Automatically proceed to next phase:
-  - **Brownfield**: Reverse Engineering (if no existing artifacts) or Requirements Analysis (if artifacts exist)
-  - **Greenfield**: Requirements Analysis
+  - **Brownfield**: Reverse Engineering (if no existing artifacts) or Create Vision, Tech Env, Features and Scopes (if artifacts exist)
+  - **Greenfield**: Create Vision, Tech Env, Features and Scopes

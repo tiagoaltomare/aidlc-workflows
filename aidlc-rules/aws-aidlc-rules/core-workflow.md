@@ -84,6 +84,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 - Workspace Detection (ALWAYS)
 - Operations Retrofit (CONDITIONAL - existing project with new extensions)
 - Reverse Engineering (CONDITIONAL - Brownfield only)
+- Create Vision, Tech Env, Features and Scopes (ALWAYS - composite; gate `vision_scope`)
 - Requirements Analysis (ALWAYS - Adaptive depth)
 - User Stories (CONDITIONAL)
 - Workflow Planning (ALWAYS)
@@ -102,7 +103,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Scan workspace for existing code
    - Determine if brownfield or greenfield
    - Check for existing reverse engineering artifacts
-5. Determine next phase: Reverse Engineering (if brownfield and no artifacts) OR Requirements Analysis
+5. Determine next phase: Reverse Engineering (if brownfield and no artifacts) OR Create Vision, Tech Env, Features and Scopes (greenfield, or brownfield with Reverse Engineering already present)
 6. **MANDATORY**: Check for Operations Retrofit condition (see Operations Retrofit stage below). If detected, next phase is Operations Retrofit.
 7. **MANDATORY**: You MUST log findings in audit.md
 8. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
@@ -150,7 +151,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - **SET**: Current Stage to `INCEPTION - Requirements Analysis`
    - **MANDATORY**: You MUST re-read aidlc-state.md and confirm: (1) Extension Configuration table has the header row but NO data rows, (2) Current Stage is `INCEPTION - Requirements Analysis`, (3) Requirements Analysis and all subsequent stages show `[ ]`, (4) `aidlc-docs/operations/retrofit-archive/aidlc-state.md` exists. You MUST NOT proceed to Step 8 until all 4 checks pass.
 8. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-9. You MUST automatically proceed to Requirements Analysis
+9. You MUST automatically proceed to Create Vision, Tech Env, Features and Scopes (reuse_if_present; do not wipe `aidlc-docs/vision/`). Do not enter Requirements Analysis until `vision_scope` is approved.
 
 ## Reverse Engineering (CONDITIONAL - Brownfield Only)
 
@@ -177,8 +178,28 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Generate technology stack documentation
    - Generate dependencies documentation
 5. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-6. **Wait for Explicit Approval**: Present detailed completion message (see reverse-engineering.md for message format) - DO NOT PROCEED until user confirms
+6. **Wait for Explicit Approval** (gate `reverse_engineering`): Present detailed completion message (see reverse-engineering.md for message format) - DO NOT PROCEED until user confirms
 7. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+8. After approval, proceed to Create Vision, Tech Env, Features and Scopes — not to Requirements Analysis
+
+## Create Vision, Tech Env, Features and Scopes (ALWAYS EXECUTE)
+
+**Always executes** after Workspace Detection (when Reverse Engineering is skipped) or after the Reverse Engineering gate. This is one composite stage with four parts and a single human gate `vision_scope`.
+
+**Parts (load and run in this order)**:
+1. `inception/create-vision.md`
+2. `inception/create-tech-env.md`
+3. `inception/feature-catalog.md`
+4. `inception/scope-breakdown.md`
+
+**Execution**:
+1. **MANDATORY**: You MUST log start of this composite stage in audit.md
+2. Load `common/config.md` values already applied at workflow start (`vision.reuse_policy`, paths)
+3. Run the four parts. Honor reuse: do not regenerate versioned Vision/Tech Env from scratch when `reuse_if_present` and the files exist under `aidlc-docs/vision/`
+4. Run `python -m aidlc_validate scope-in-vision --root PRODUCT_REPO` (blocking)
+5. Seed `aidlc-docs/assumptions.md` if it does not exist
+6. **Wait for Explicit Approval** (gate `vision_scope`): present Vision, Tech Env, catalog, scopes (in/out), low-confidence features, change proposals, and assumptions. DO NOT start Requirements Analysis until the person approves
+7. **MANDATORY**: You MUST log the person's response in audit.md with complete raw input
 
 ## Requirements Analysis (ALWAYS EXECUTE - Adaptive Depth)
 
