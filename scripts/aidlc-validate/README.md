@@ -23,14 +23,15 @@ Install from this directory (`pip install -e .`) or set `PYTHONPATH` to
 | `units-dag`       | `aidlc-docs/inception/application-design/unit-of-work.md`, `unit-of-work-dependency.md`                                                                                                                                                               |
 | `traceability`    | Current-cycle scope (`scope.current_path`, else `scope-*.md`), `inception/requirements/requirements.md`, `user-stories/stories.md`, `unit-of-work-story-map.md`                                                                                       |
 | `scope-in-vision` | `aidlc-docs/vision/features.md`, current-cycle scope (`scope.current_path`, else `scope-*.md`; alias files with the same `SCOPE-` id count once)                                                                                                      |
-| `export`          | `aidlc.config.yaml` `operations.include` / `exclude`, docs-site folder (`operations.docusaurus_path`, default `docs-site`; must resolve inside the project root, no `..` or symlink escape); unescaped `{ident}` and `[Answer]:` lines in exported markdown fail; `node_modules` / `build` / `.docusaurus` are skipped |
+| `export`          | `aidlc.config.yaml` `operations.include` / `exclude`, docs-site folder (`operations.docusaurus_path`, default `docs-site`); unescaped `{ident}` and `[Answer]:` lines in exported markdown fail; `node_modules` / `build` / `.docusaurus` are skipped |
 | `stories`         | `aidlc-docs/inception/user-stories/stories.md` plus `stories.*` in the config (As a / I want, min/max AC)                                                                                                                                             |
 | `assumptions`     | `aidlc-docs/assumptions.md` table (`id`, `stage`, `blocking`, `question`, `assumption_or_answer`, `status`); fails on missing file, malformed rows, or blocking rows that are not `answered`                                                          |
 
 `export` also runs `npm run build` in the docs-site folder when
 `package.json` is present, or when `operations.prove_build` is `true`.
 Set `prove_build: false` to skip that build. Missing node/npm when the
-build is required is a failure.
+build is required is a failure. `operations.docusaurus_path` must resolve
+inside the project root (no `..` or symlink escape).
 
 `gates.checks` in `aidlc.config.yaml` is a whitelist of these check ids.
 An omitted id is skipped. `severity: advisory` prints findings and exits 0.
