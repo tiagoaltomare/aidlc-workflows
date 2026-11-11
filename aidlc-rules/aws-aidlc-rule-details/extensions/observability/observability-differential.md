@@ -21,6 +21,7 @@ These rules build on the baseline observability strategy (`extensions/observabil
 Is this workload accessible over the public internet?
 
 A) Yes — the workload has public internet endpoints
+
 B) No — the workload is only accessible within a private network (VPC, corporate network)
 
 [Answer]:

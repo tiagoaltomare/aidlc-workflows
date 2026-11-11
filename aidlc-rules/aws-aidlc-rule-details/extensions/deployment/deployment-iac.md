@@ -35,7 +35,9 @@ following IaC tool has been selected:
 **Rationale**: [why this tool best fits the architecture]
 
 A) Approve — proceed with this IaC tool
+
 B) Modify — I want a different tool (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

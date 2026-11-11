@@ -7,9 +7,13 @@ IaC-driven deployment, phased rollout across fault isolation boundaries, alarm-g
 Should deployment extension rules be enforced for this project?
 
 A) Yes — enforce AWS best-practice deployment rules
+
 B) Yes — enforce AWS best-practice deployment rules AND organisation-specific custom rules
+
 C) Custom only — enforce only organisation-specific custom rules
+
 D) No — skip all deployment rules (suitable for PoCs, prototypes, and non-deployable artifacts)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

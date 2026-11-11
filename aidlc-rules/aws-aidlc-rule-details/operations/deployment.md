@@ -54,6 +54,7 @@ Validation check:
 Would you like the Operations phase to test deployment of your workload to a live environment?
 
 A) Yes — deploy the workload and run post-deployment testing
+
 B) No — skip deployment and post-deployment testing
 
 [Answer]:

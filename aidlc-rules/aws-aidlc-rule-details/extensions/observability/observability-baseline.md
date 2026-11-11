@@ -71,7 +71,9 @@ These questions are presented during Requirements Analysis after the user opts i
 How should telemetry (metrics, logs, traces) be collected and shipped?
 
 A) AWS Native — CloudWatch Agent, X-Ray daemon, CloudWatch Logs (recommended for AWS-only workloads)
+
 B) OpenTelemetry — AWS Distro for OpenTelemetry (ADOT) Collector for metrics, logs, and traces (recommended for multi-backend or vendor-neutral requirements)
+
 C) Hybrid — specify which signals use which pipeline after [Answer]: tag below
 
 [Answer]:
@@ -82,6 +84,7 @@ C) Hybrid — specify which signals use which pipeline after [Answer]: tag below
 Do you want to implement closed-loop observability? This builds componentry that monitors steady-state and peak traffic patterns, learns production baselines, and triggers updates to alarm thresholds, dashboard descriptions, and capacity projections as behaviour evolves.
 
 A) Yes — build automated baselining and closed-loop refinement (recommended for production services with evolving traffic patterns)
+
 B) No — use static thresholds set during construction (suitable for stable, predictable workloads)
 
 **Note: Closed-loop observability is a future capability. This question is included for planning purposes only. The model MUST NOT implement AIOBS-LOOP rules at this time regardless of the user's answer.**
@@ -117,7 +120,9 @@ Based on the application design, the following customer-facing KPIs have been id
 | 2 | [KPI name] | [What it measures from the customer's perspective] |
 
 A) Approve — these KPIs correctly represent the key business outcomes
+
 B) Modify — I want to adjust, add, or remove KPIs (describe changes after [Answer]: tag below)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

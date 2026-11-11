@@ -114,6 +114,7 @@ For each fault isolation boundary, what level of automation is appropriate for m
 | Region failover | Entire region | A) Fully automatic  B) Human approval |
 
 A) Fully automatic — runbook is triggered and executed without human intervention
+
 B) Human approval — runbook automation is triggered automatically but includes a human approval step that pauses execution until approved
 
 [Answer]:

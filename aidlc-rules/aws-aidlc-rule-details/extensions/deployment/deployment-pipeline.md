@@ -57,7 +57,9 @@ the following pipeline tool has been selected:
 **Reachability**: [confirmation that the tool can be deployed, triggered, and observed from the current environment]
 
 A) Approve — proceed with this pipeline tool
+
 B) Modify — I want a different tool (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:
@@ -188,8 +190,11 @@ are proposed:
 | [env name] | [purpose] | [stages that target this env] | [isolation method] |
 
 A) Approve — proceed with these environments
+
 B) Add environment — I need an additional environment (describe after [Answer]: tag)
+
 C) Modify — change the proposed environments (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

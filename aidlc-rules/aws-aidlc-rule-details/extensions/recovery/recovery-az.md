@@ -321,7 +321,9 @@ Against autoshift:
 - You lose direct control over when AZ shifts are initiated
 
 A) Enable autoshift — accept AWS-triggered shifts; configure practice runs
+
 B) Disable autoshift — use manual zonal shift only, triggered by your own alarms
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

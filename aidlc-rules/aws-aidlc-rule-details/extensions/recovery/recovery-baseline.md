@@ -179,7 +179,9 @@ Based on the architecture, the following service classifications have been ident
 | [service] | [zonal / regional with zonal recovery control / regional without zonal recovery control / global] | [what must be done] |
 
 A) Approve — these classifications are correct
+
 B) Modify — one or more classifications need to change (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:
@@ -221,7 +223,9 @@ What are the recovery objectives for this system? Please complete the table for 
 | Region (if applicable) | | |
 
 A) Confirm — objectives are as stated above
+
 B) Modify — I want to adjust the objectives (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:
@@ -327,8 +331,11 @@ Testing MUST use chaos engineering to simulate failure outcomes. The model MUST 
 Recovery chaos experiments have been designed. What is the current demonstration status?
 
 A) Designed only — experiments will be run post-deployment (game day scheduled)
+
 B) Experiments run and passed — results documented, lessons learned actioned
+
 C) Experiments run with gaps identified — gaps recorded and scheduled for resolution
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:
@@ -459,7 +466,9 @@ The following recovery rules have dependencies on the observability extension, w
 Do you accept this risk and wish to proceed with manual-only recovery controls?
 
 A) Yes — accept the risk, proceed with manual-only recovery controls, log to audit
+
 B) No — enable the observability extension to support automated recovery
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

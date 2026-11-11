@@ -112,7 +112,9 @@ Validation check:
 **Requirement**: [what MUST be true, in blocking language]
 
 A) Approve — add this requirement and restart the workflow
+
 B) Reject — document as known exception
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

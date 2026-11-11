@@ -144,6 +144,7 @@ All other observability capabilities (structured logging, infrastructure alarms,
 
 Which customer journeys require these additional capabilities?
 A) All of the above
+
 B) Select specific journeys: [list numbers]
 
 [Answer]:

@@ -7,9 +7,13 @@ Recovery controls for fault isolation, automated failover, and resilience testin
 Should recovery extension rules be enforced for this project?
 
 A) Yes — enforce AWS best-practice recovery rules (AIREC-STRAT + extensions/recovery/ rule files, excluding custom)
+
 B) Yes — enforce AWS best-practice recovery rules AND organisation-specific custom rules (all files including recovery-custom.md)
+
 C) Custom only — enforce only organisation-specific custom rules (recovery-custom.md only)
+
 D) No — skip all recovery rules (suitable for PoCs, prototypes, and experimental projects)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

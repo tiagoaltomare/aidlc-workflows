@@ -178,7 +178,9 @@ the deployment rolls back automatically.
 Proposed bake time per phase: 5 minutes (minimum recommended)
 
 A) Approve — 5 minutes is acceptable
+
 B) Increase — I want a longer bake time (specify after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

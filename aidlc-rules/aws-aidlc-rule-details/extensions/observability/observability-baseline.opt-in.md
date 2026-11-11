@@ -6,8 +6,11 @@ Structured logging, metrics aligned to customer-facing KPIs, distributed tracing
 Do you want to implement AWS best-practice based observability for this project? This includes structured logging, metrics aligned to customer-facing KPIs, distributed tracing, and alarms — designed to detect, assess, and diagnose customer-impacting issues.
 
 A) Yes — implement AWS best-practice observability rules
+
 B) Yes, with custom rules — implement AWS best-practice rules plus organisation-specific rules defined in observability-custom.md
+
 C) Custom only — implement only organisation-specific rules from observability-custom.md (skip AWS best-practice rules)
+
 D) No — this project does not require observability (suitable for libraries, CLI tools, or non-deployable artifacts)
 
 [Answer]:

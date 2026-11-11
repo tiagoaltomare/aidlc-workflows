@@ -6,8 +6,11 @@ Documented, tested, and automated runbooks for operational procedures. Ensures c
 Do you want to implement AWS best-practice runbook rules for this project? This includes documented operational procedures, automated runbook execution, and runbook testing — ensuring consistent and prompt responses to operational events.
 
 A) Yes — implement AWS best-practice runbook rules
+
 B) Yes, with custom rules — implement AWS best-practice rules plus organisation-specific rules defined in runbooks-custom.md
+
 C) Custom only — implement only organisation-specific rules from runbooks-custom.md (skip AWS best-practice rules)
+
 D) No — this project does not require runbooks (suitable for libraries, CLI tools, or non-deployable artifacts)
 
 [Answer]:

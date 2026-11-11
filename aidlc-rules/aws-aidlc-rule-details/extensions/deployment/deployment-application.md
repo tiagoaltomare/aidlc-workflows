@@ -55,7 +55,9 @@ Based on the architecture, the following deployment mechanism has been derived:
 **Rollback mechanism**: [how rollback works]
 
 A) Approve — proceed with this deployment mechanism
+
 B) Modify — I want a different mechanism (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:

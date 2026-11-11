@@ -342,6 +342,7 @@ Validation check:
 
 ## Options
 A) Request Changes — specify what needs adjustment
+
 B) Complete — finalise Validation stage
 ```
 

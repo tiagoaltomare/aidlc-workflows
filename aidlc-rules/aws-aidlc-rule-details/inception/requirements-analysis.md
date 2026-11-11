@@ -166,7 +166,9 @@ If none of the provided options match your needs, choose the last option (Other/
 {description}
 
 A) {option}
+
 B) {option}
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]: {answer}

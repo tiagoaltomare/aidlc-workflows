@@ -54,6 +54,7 @@ is permitted for this workload. Consider all of the following:
   be accessible from certain regions
 
 A) Confirmed — using a secondary AWS Region is permitted for this workload and its data
+
 B) Excluded — data localisation requirements prevent the use of a secondary region.
    Log to audit and skip all AIREC-REG rules.
 
@@ -74,6 +75,7 @@ Combined with your stated RTO of [X], a failure beyond an Availability Zone woul
 exceed your recovery objectives without multi-region resilience.
 
 A) Design for multi-region — accept the cost and complexity to meet the stated RTO
+
 B) Stay single-region — accept that a failure beyond an Availability Zone will exceed
    your RTO of [X]. This decision will be logged to audit as an accepted trade-off.
 
@@ -131,6 +133,7 @@ Do you need to offer a subset of your users faster recovery — i.e. traffic ser
 immediately on failover without waiting for scale-up to complete?
 
 A) No — all users can tolerate the warm standby scale-up window
+
 B) Yes — a subset of users require faster recovery. Approximately what percentage
    of your user base requires immediate failover? [provide percentage]
 X) Other (please describe after [Answer]: tag below)
@@ -179,7 +182,9 @@ Based on the stated RTO and RPO, the following region recovery strategy is propo
 **Estimated cost implication**: [relative cost — low / medium / high]
 
 A) Approve — proceed with this strategy
+
 B) Modify — I want a different strategy (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:
@@ -276,7 +281,9 @@ The following region recovery control mechanism has been evaluated:
 **Satisfies AIREC-STRAT-012 (customer-controllable via CLI or API)**: [Yes / No — explanation]
 
 A) Approve — proceed with this recovery control mechanism
+
 B) Modify — I want a different mechanism (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:
@@ -383,7 +390,9 @@ The following data replication configuration has been designed:
 | [store] | [mechanism] | [lag] | [RPO] |
 
 A) Accept — the effective RPO for each data store is acceptable
+
 B) Modify — one or more RPOs are not acceptable (describe after [Answer]: tag)
+
 X) Other (please describe after [Answer]: tag below)
 
 [Answer]:
@@ -580,6 +589,7 @@ available in the chosen secondary region: [secondary region name]
 | [service] | [Yes / No / Verify] | |
 
 A) Confirmed — all services are available in the secondary region
+
 B) Gaps identified — one or more services are not available; architecture changes
    required before region recovery can proceed (describe after [Answer]: tag)
 X) Other (please describe after [Answer]: tag below)
