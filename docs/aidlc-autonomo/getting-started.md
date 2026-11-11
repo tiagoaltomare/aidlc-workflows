@@ -134,6 +134,15 @@ Analysis records opt-in. Opted OUT means that prompt's skip/No option
 (B, C, or D — whatever letter the file offers). Do not assume the skip
 letter is always D.
 
+### Validator checks
+
+`python3 -m aidlc_validate CHECK --root PRODUCT_REPO` — `CHECK` is one of
+`config`, `units-dag`, `traceability`, `scope-in-vision`, `export`,
+`stories`, `assumptions`. The `assumptions` check reads
+`aidlc-docs/assumptions.md` and fails on a missing or malformed table or
+on a blocking row that is not `answered`. It runs at `inception_end`
+with the other package checks.
+
 ### AGENTS.md
 
 If a framework scaffold (for example `create-next-app`) writes

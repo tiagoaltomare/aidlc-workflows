@@ -10,7 +10,7 @@ python3 -m aidlc_validate CHECK --root PRODUCT_REPO
 Use **`python3`**. Do not assume a `python` command exists.
 
 `CHECK` is one of: `config`, `units-dag`, `traceability`, `scope-in-vision`,
-`export`, `stories`. Non-zero exit prints the failures to stderr.
+`export`, `stories`, `assumptions`. Non-zero exit prints the failures to stderr.
 
 Install from this directory (`pip install -e .`) or set `PYTHONPATH` to
 `scripts/aidlc-validate`.
@@ -25,6 +25,7 @@ Install from this directory (`pip install -e .`) or set `PYTHONPATH` to
 | `scope-in-vision` | `aidlc-docs/vision/features.md`, current-cycle scope (`scope.current_path`, else `scope-*.md`; alias files with the same `SCOPE-` id count once)                                                                                                      |
 | `export`          | `aidlc.config.yaml` `operations.include` / `exclude`, docs-site folder (`operations.docusaurus_path`, default `docs-site`); unescaped `{ident}` and `[Answer]:` lines in exported markdown fail; `node_modules` / `build` / `.docusaurus` are skipped |
 | `stories`         | `aidlc-docs/inception/user-stories/stories.md` plus `stories.*` in the config (As a / I want, min/max AC)                                                                                                                                             |
+| `assumptions`     | `aidlc-docs/assumptions.md` table (`id`, `stage`, `blocking`, `question`, `assumption_or_answer`, `status`); fails on missing file, malformed rows, or blocking rows that are not `answered`                                                          |
 
 ## ID conventions
 

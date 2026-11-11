@@ -9,18 +9,18 @@ person.
 Write a short result under `aidlc-docs/checks/<check-id>.md` (pass / fail /
 advisory, command, exit code).
 
-| id                 | Command              | When                                              | Default severity |
-| ------------------ | -------------------- | ------------------------------------------------- | ---------------- |
-| `scope_in_vision`  | `scope-in-vision`    | After scope breakdown and at `vision_scope`       | blocking         |
-| `traceability`     | `traceability`       | After Requirements, Stories, Units; `inception_end` | blocking       |
-| `story_standard`   | `stories`            | After User Stories (if the stage ran)             | blocking         |
-| `units_dag`        | `units-dag`          | After Units Generation (if the stage ran)         | blocking         |
-| `export`           | `export`             | After Docusaurus export                           | blocking         |
-| `config`           | `config`             | Workflow start, if `aidlc.config.yaml` exists     | blocking         |
+| id                     | Command           | When                                                | Default severity |
+| ---------------------- | ----------------- | --------------------------------------------------- | ---------------- |
+| `scope_in_vision`      | `scope-in-vision` | After scope breakdown and at `vision_scope`         | blocking         |
+| `traceability`         | `traceability`    | After Requirements, Stories, Units; `inception_end` | blocking         |
+| `story_standard`       | `stories`         | After User Stories (if the stage ran)               | blocking         |
+| `units_dag`            | `units-dag`       | After Units Generation (if the stage ran)           | blocking         |
+| `assumptions_complete` | `assumptions`     | At `inception_end` (and whenever the file is asked) | blocking         |
+| `export`               | `export`          | After Docusaurus export                             | blocking         |
+| `config`               | `config`          | Workflow start, if `aidlc.config.yaml` exists       | blocking         |
 
-`assumptions_complete` and `vision_tech_consistency` are inspected from the
-artifacts (every open question is in `assumptions.md`; stack/allow-lists
-respected). They are not separate validator subcommands in this phase.
+`vision_tech_consistency` is inspected from the artifacts (stack/allow-lists
+respected). It is not a separate validator subcommand in this phase.
 
 Severity comes from `gates.checks` in `aidlc.config.yaml`. `blocking` means
 do not cross the next stage boundary (or the phase-end gate) until the check

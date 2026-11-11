@@ -377,10 +377,15 @@ Not a generation stage. Present the Inception package and **wait for explicit ap
 
 - Diff of the current scope vs stories (in-scope covered, in-scope missing, extras)
 - `aidlc-docs/assumptions.md`
-- Check results (`traceability`, `stories` if Stories ran, `units-dag` if Units ran)
+- Check results (`traceability`, `stories` if Stories ran, `units-dag` if Units ran, `assumptions`)
 - SKIPs and depths from Workflow Planning, including Operations stages
 - Unit DAG and story map
 - Extensions opted in and refused
+
+Run `python3 -m aidlc_validate assumptions --root PRODUCT_REPO` before presenting
+this gate. A non-zero exit (malformed file or unresolved blocking row) is a
+blocking check: fix or escalate; do not start Construction until it passes or
+the person decides at this gate.
 
 The person may change any Inception artifact. Do not start Construction until they approve. Log the raw reply in `audit.md`.
 

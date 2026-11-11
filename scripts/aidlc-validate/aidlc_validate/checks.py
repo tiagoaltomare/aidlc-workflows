@@ -60,6 +60,18 @@ UNITS_DAG_PATH = Path(
 STORY_MAP_PATH = Path(
     "aidlc-docs/inception/application-design/unit-of-work-story-map.md"
 )
+ASSUMPTIONS_PATH = Path("aidlc-docs/assumptions.md")
+ASSUMPTION_ID_RE = re.compile(r"^A-\d{3,}$")
+ASSUMPTION_REQUIRED_COLS = (
+    "id",
+    "stage",
+    "blocking",
+    "question",
+    "assumption_or_answer",
+    "status",
+)
+ASSUMPTION_BLOCKING = {"yes", "no"}
+ASSUMPTION_STATUS = {"open", "answered", "stopped"}
 CYCLE_ARTIFACT_GLOBS = [
     "aidlc-docs/inception/**/*.md",
     "aidlc-docs/construction/**/*.md",
@@ -557,6 +569,60 @@ def check_export(root: Path) -> list[str]:
                 f"export: unescaped [Answer]: line in {rel} "
                 r"(rewrite as \[Answer\]: or wrap so it is not a link reference)"
             )
+    return errors
+
+
+def check_assumptions(root: Path) -> list[str]:
+    """Table format plus no unresolved blocking rows (`common/assumptions.md`)."""
+    path = root / ASSUMPTIONS_PATH
+    if not path.is_file():
+        return [f"assumptions: missing {ASSUMPTIONS_PATH}"]
+    text = _read(path)
+    tables = parse_markdown_tables(text)
+    errors: list[str] = []
+    seen: dict[str, int] = {}
+    for table in tables:
+        if not table:
+            continue
+        missing_cols = [
+            col for col in ASSUMPTION_REQUIRED_COLS if col not in table[0]
+        ]
+        if missing_cols:
+            errors.append(
+                "assumptions: table missing required columns: "
+                + ", ".join(missing_cols)
+            )
+            continue
+        for row in table:
+            aid = row.get("id", "").strip()
+            if not aid:
+                errors.append("assumptions: row with empty id")
+                continue
+            if not ASSUMPTION_ID_RE.fullmatch(aid):
+                errors.append(
+                    f"assumptions: {aid} is not an A- plus at least three digits id"
+                )
+            if aid in seen:
+                errors.append(f"assumptions: duplicate id {aid}")
+            seen[aid] = seen.get(aid, 0) + 1
+            for col in ("stage", "question", "assumption_or_answer"):
+                if not row.get(col, "").strip():
+                    errors.append(f"assumptions: {aid} has empty {col}")
+            blocking = row.get("blocking", "").strip().lower()
+            if blocking not in ASSUMPTION_BLOCKING:
+                errors.append(
+                    f"assumptions: {aid} blocking must be yes or no, got {blocking!r}"
+                )
+            status = row.get("status", "").strip().lower()
+            if status not in ASSUMPTION_STATUS:
+                errors.append(
+                    f"assumptions: {aid} status must be open, answered, or stopped, "
+                    f"got {status!r}"
+                )
+            if blocking == "yes" and status != "answered":
+                errors.append(
+                    f"assumptions: open blocking question {aid} (status {status})"
+                )
     return errors
 
 

@@ -18,6 +18,7 @@ CHECK_FNS: dict[str, CheckFn] = {
     "scope-in-vision": checks.check_scope_in_vision,
     "export": checks.check_export,
     "stories": checks.check_stories,
+    "assumptions": checks.check_assumptions,
 }
 
 

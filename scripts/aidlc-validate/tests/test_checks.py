@@ -229,3 +229,70 @@ def test_export_skips_node_modules_build_docusaurus():
     rc, out, err = _run("export", FIXTURES / "export_site_junk")
     assert rc == 0, err
     assert "export: pass" in out
+
+
+def test_assumptions_valid_passes():
+    rc, out, err = _run("assumptions", FIXTURES / "valid")
+    assert rc == 0, err
+    assert "assumptions: pass" in out
+
+
+def test_assumptions_empty_table_passes(tmp_path: Path):
+    (tmp_path / "aidlc-docs").mkdir()
+    (tmp_path / "aidlc-docs" / "assumptions.md").write_text(
+        "# Assumptions\n\n| id | stage | blocking | question | assumption_or_answer | status |\n"
+        "| --- | ----- | -------- | -------- | -------------------- | ------ |\n",
+        encoding="utf-8",
+    )
+    rc, out, err = _run("assumptions", tmp_path)
+    assert rc == 0, err
+    assert "assumptions: pass" in out
+
+
+def test_assumptions_missing_fails():
+    rc, _out, err = _run("assumptions", FIXTURES / "assumptions_missing")
+    assert rc == 1
+    assert "missing" in err
+    assert "assumptions.md" in err
+
+
+def test_assumptions_open_blocking_fails():
+    rc, _out, err = _run("assumptions", FIXTURES / "assumptions_open_blocking")
+    assert rc == 1
+    assert "open blocking question A-001" in err
+
+
+def test_assumptions_stopped_blocking_fails(tmp_path: Path):
+    (tmp_path / "aidlc-docs").mkdir()
+    (tmp_path / "aidlc-docs" / "assumptions.md").write_text(
+        "# Assumptions\n\n"
+        "| id | stage | blocking | question | assumption_or_answer | status |\n"
+        "| --- | ----- | -------- | -------- | -------------------- | ------ |\n"
+        "| A-001 | requirements | yes | Opt in? | waiting | stopped |\n",
+        encoding="utf-8",
+    )
+    rc, _out, err = _run("assumptions", tmp_path)
+    assert rc == 1
+    assert "open blocking question A-001" in err
+    assert "stopped" in err
+
+
+def test_assumptions_bad_format_fails():
+    rc, _out, err = _run("assumptions", FIXTURES / "assumptions_bad_format")
+    assert rc == 1
+    assert "missing required columns" in err
+
+
+def test_assumptions_duplicate_id_fails(tmp_path: Path):
+    (tmp_path / "aidlc-docs").mkdir()
+    (tmp_path / "aidlc-docs" / "assumptions.md").write_text(
+        "# Assumptions\n\n"
+        "| id | stage | blocking | question | assumption_or_answer | status |\n"
+        "| --- | ----- | -------- | -------- | -------------------- | ------ |\n"
+        "| A-001 | requirements | no | Q1 | Assumed X | open |\n"
+        "| A-001 | stories | no | Q2 | Assumed Y | open |\n",
+        encoding="utf-8",
+    )
+    rc, _out, err = _run("assumptions", tmp_path)
+    assert rc == 1
+    assert "duplicate id A-001" in err

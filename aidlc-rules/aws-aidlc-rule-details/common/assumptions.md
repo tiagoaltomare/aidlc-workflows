@@ -12,13 +12,21 @@ it is missing. **Append only.**
 ```markdown
 # Assumptions
 
-| id  | stage | blocking | question | assumption_or_answer | status |
-| --- | ----- | -------- | -------- | -------------------- | ------ |
-| A-001 | requirements | no | … | Assumed X | open |
+| id    | stage        | blocking | question | assumption_or_answer | status |
+| ----- | ------------ | -------- | -------- | -------------------- | ------ |
+| A-001 | requirements | no       | …        | Assumed X            | open   |
 ```
 
+This table is the required format. `python3 -m aidlc_validate assumptions --root PRODUCT_REPO` checks it.
+
+- `id`: unique, `A-` plus at least three digits (`A-001`)
+- `stage`: the stage that recorded the row (non-empty)
 - `blocking`: `yes` or `no`
-- `status`: `open`, `answered`, `stopped`
+- `question`: the open question (non-empty)
+- `assumption_or_answer`: the default taken, or the person's answer (non-empty)
+- `status`: `open`, `answered`, or `stopped`
+
+The check **fails** if the file is missing, the table is malformed, a required cell is empty, an `id` is duplicated or not `A-…`, `blocking`/`status` use other values, or any **blocking** row is not `answered` (`open` or `stopped` still waits for the person). An empty table (heading only) is valid.
 
 ## Blocking vs not
 
