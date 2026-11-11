@@ -67,3 +67,23 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Run validator pytest
         run: pytest -q
+
+  docusaurus-scaffold:
+    name: Docusaurus scaffold
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: templates/docusaurus-scaffold
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: templates/docusaurus-scaffold/package.json
+      - name: Install and build scaffold
+        run: |
+          npm install
+          npm run build
