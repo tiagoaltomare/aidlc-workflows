@@ -460,13 +460,61 @@ def check_export(root: Path) -> list[str]:
 
 
 def check_stories(root: Path) -> list[str]:
-    """F0 stub. Full format / INVEST / AC min-max enforcement is F3.
-
-    Presence of this subcommand keeps the CLI surface stable. It always passes.
-    """
-    print(
-        "stories: stub — F3 will enforce format, INVEST, and min/max "
-        "acceptance criteria from config",
-        file=sys.stdout,
+    """Format + min/max acceptance criteria from config.stories (F3)."""
+    cfg, cfg_errors = load_config(root)
+    stories_cfg: dict = {}
+    if cfg is not None:
+        stories_cfg = cfg.get("stories") or {}
+    elif cfg_errors and "not found" not in cfg_errors[0]:
+        return cfg_errors
+    min_ac = int(stories_cfg.get("min_acceptance_criteria") or 2)
+    max_ac = int((stories_cfg.get("max_size") or {}).get("max_acceptance_criteria") or 5)
+    fmt = str(stories_cfg.get("format") or "")
+    invest = bool(stories_cfg.get("invest_required", True))
+    path = root / STORIES_PATH
+    if not path.is_file():
+        return []
+    text = _read(path)
+    blocks = re.split(r"(?=^#{1,6}\s+US-)", text, flags=re.M)
+    errors: list[str] = []
+    found = 0
+    ac_line = re.compile(
+        r"^\s*(?:[-*] )?(?:Given|When|Then|And)\b", re.I
     )
-    return []
+    for block in blocks:
+        ids = _heading_ids("US", block) or _ids("US", block.splitlines()[0] if block else "")
+        if not ids:
+            continue
+        us = ids[0]
+        found += 1
+        ac_count = sum(1 for line in block.splitlines() if ac_line.match(line))
+        if ac_count == 0:
+            # Fall back to list items under an Acceptance Criteria heading.
+            in_ac = False
+            for line in block.splitlines():
+                if re.match(r"^#{1,6}\s+.*acceptance", line, re.I) or re.match(
+                    r"^\s*\*\*acceptance criteria", line, re.I
+                ):
+                    in_ac = True
+                    continue
+                if in_ac and re.match(r"^#{1,6}\s+", line):
+                    in_ac = False
+                if in_ac and re.match(r"^\s*[-*]\s+\S", line):
+                    ac_count += 1
+        if ac_count < min_ac:
+            errors.append(
+                f"stories: {us} has {ac_count} acceptance criteria; min is {min_ac}"
+            )
+        if ac_count > max_ac:
+            errors.append(
+                f"stories: {us} has {ac_count} acceptance criteria; max is {max_ac}"
+            )
+        if "as_a" in fmt.lower() or invest:
+            lowered = block.lower()
+            if "as a" not in lowered or "i want" not in lowered:
+                errors.append(
+                    f"stories: {us} must use As a / I want (format {fmt!r})"
+                )
+    if found == 0:
+        errors.append(f"stories: no US- headings in {STORIES_PATH}")
+    return errors

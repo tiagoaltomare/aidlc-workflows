@@ -1,5 +1,7 @@
 # Requirements Analysis (Adaptive)
 
+> Autonomous Inception: `common/inception-autonomy.md` removes the stage-completion gate. Extension opt-in in Steps 5–6 stays a **blocking question**.
+
 > **OVERRIDE**: Steps 5 and 6 (including all sub-steps) in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. These steps collect extension opt-in answers, load extension rules, and generate clarifying questions. They MUST be executed. The model MUST NOT skip them, combine them, or treat them as optional. Extension configuration determines which rules are enforced for the entire workflow.
 
 **Assume the role** of a product owner
@@ -255,6 +257,5 @@ Update `aidlc-docs/aidlc-state.md`:
 
 **Note**: Include the "Add User Stories" option only when User Stories stage will be skipped. Replace [User Stories/Workflow Planning] with the actual next stage name.
 
-   - Wait for explicit user approval before proceeding
-   - Record approval response with timestamp
+   - Do not wait for a stage-completion gate. Continue to User Stories or Workflow Planning. Review is at `inception_end`.
    - Update Requirements Analysis stage complete in aidlc-state.md

@@ -1,5 +1,7 @@
 # Workflow Planning
 
+> Autonomous Inception: `common/inception-autonomy.md` removes the stage-completion gate. Human override of EXECUTE/SKIP is at `inception_end`. High/Critical risk feeds design validation.
+
 > **OVERRIDE**: Steps 6 and 7 are exempt from the Adaptive Workflow Principle. EXECUTE or SKIP for each stage MUST be determined solely by the Execute IF and Skip IF conditions in Step 3. The model MUST NOT apply its own feasibility judgement. The Operations phase MUST always be included.
 
 **Purpose**: Determine which phases to execute and create comprehensive execution plan

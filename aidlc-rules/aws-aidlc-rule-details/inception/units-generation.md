@@ -1,9 +1,11 @@
 # Units Generation - Detailed Steps
 
+> Autonomous Inception: `common/inception-autonomy.md` removes the plan gate and the generation gate. Require an acyclic DAG. Review is at `inception_end`. The stage stays conditional.
+
 ## Overview
 This stage decomposes the system into manageable units of work through two integrated parts:
-- **Part 1 - Planning**: Create decomposition plan with questions, collect answers, analyze for ambiguities, get approval
-- **Part 2 - Generation**: Execute approved plan to generate unit artifacts
+- **Part 1 - Planning**: Create decomposition plan with questions; non-blocking answers go to `assumptions.md`
+- **Part 2 - Generation**: Generate unit artifacts; run `units-dag`
 
 **DEFINITION**: A unit of work is a logical grouping of stories for development purposes. For microservices, each unit becomes an independently deployable service. For monoliths, the single unit represents the entire application with logical modules.
 
@@ -87,9 +89,8 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
   - "You indicated 'not sure' - what additional information would help you decide?"
   - "You mentioned 'depends on complexity' - how do you define complexity levels?"
 
-## Step 9: Request Approval
-- Ask: "**Unit of work plan complete. Review the plan in aidlc-docs/inception/plans/unit-of-work-plan.md. Ready to proceed to generation?**"
-- DO NOT PROCEED until user confirms
+## Step 9: No plan gate
+- Do not wait. Continue to generation. Honor `units.max_stories_per_unit`.
 
 ## Step 10: Log Approval
 - Log prompt and response in audit.md with timestamp
@@ -144,10 +145,8 @@ If the analysis in step 7 reveals ANY ambiguous answers, you MUST:
 > ✅ **Approve & Continue** - Approve units and proceed to **CONSTRUCTION PHASE**
 ```
 
-## Step 17: Wait for Explicit Approval
-- Do not proceed until the user explicitly approves the units generation
-- Approval must be clear and unambiguous
-- If user requests changes, update the units and repeat the approval process
+## Step 17: No units gate
+- Run `python -m aidlc_validate units-dag --root PRODUCT_REPO`. Continue to `inception_end`.
 
 ## Step 18: Record Approval Response
 - Log the user's approval response with timestamp in `aidlc-docs/audit.md`

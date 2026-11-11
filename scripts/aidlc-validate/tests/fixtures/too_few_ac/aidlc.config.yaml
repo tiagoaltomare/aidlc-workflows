@@ -1,0 +1,7 @@
+schema_version: "1"
+stories:
+  format: as_a_i_want_so_that+gherkin
+  invest_required: true
+  min_acceptance_criteria: 2
+  max_size:
+    max_acceptance_criteria: 5

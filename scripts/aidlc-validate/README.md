@@ -22,7 +22,7 @@ Install from this directory (`pip install -e .`) or set `PYTHONPATH` to
 | `traceability`    | `aidlc-docs/vision/scopes/scope-*.md`, `inception/requirements/requirements.md`, `user-stories/stories.md`, `unit-of-work-story-map.md`  |
 | `scope-in-vision` | `aidlc-docs/vision/features.md`, `aidlc-docs/vision/scopes/scope-*.md`                                                                   |
 | `export`          | `aidlc.config.yaml` `operations.include` / `exclude`, docs-site folder (`operations.docusaurus_path`, default `docs-site`)               |
-| `stories`         | stub in F0 (always passes); F3 will read `stories.*` in the config and `aidlc-docs/inception/user-stories/stories.md`                    |
+| `stories`         | `aidlc-docs/inception/user-stories/stories.md` plus `stories.*` in the config (As a / I want, min/max AC)                                |
 
 ## ID conventions
 

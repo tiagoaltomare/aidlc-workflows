@@ -1,5 +1,7 @@
 # Application Design - Detailed Steps
 
+> Autonomous Inception: `common/inception-autonomy.md` removes the stage-completion gate. The stage stays conditional. Review is at `inception_end`.
+
 ## Purpose
 **High-level component identification and service layer design**
 
@@ -131,7 +133,7 @@ If the analysis in step 8 reveals ANY ambiguous answers, you MUST:
 > ✅ **Approve & Continue** - Approve design and proceed to **[Units Generation/CONSTRUCTION PHASE]**
 ```
 
-### 13. Wait for Explicit Approval
+### 13. No stage gate — continue. Review is at `inception_end`.
 - Do not proceed until the user explicitly approves the application design
 - Approval must be clear and unambiguous
 - If user requests changes, update the design and repeat the approval process

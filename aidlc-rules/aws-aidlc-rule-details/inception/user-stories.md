@@ -1,5 +1,7 @@
 # User Stories - Detailed Steps
 
+> Autonomous Inception: `common/inception-autonomy.md` removes the plan gate and the stories gate. Apply `stories.*` from config. Review is at `inception_end`. The stage stays conditional (v1 skip rules still apply).
+
 ## Purpose
 **Convert requirements into user-centered stories with acceptance criteria**
 
@@ -213,10 +215,9 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 - Include the complete approval prompt text
 - Use ISO 8601 timestamp format
 
-## Step 13: Wait for Explicit Approval of Plan
-- Do not proceed until the user explicitly approves the story approach
-- Approval must be clear and unambiguous
-- If user requests changes, update the plan and repeat the approval process
+## Step 13: No plan gate
+- Do not wait. Apply `stories.format`, `invest_required`, `min_acceptance_criteria`, and `max_size` from `aidlc.config.yaml`.
+- Non-blocking questions go to `aidlc-docs/assumptions.md`. Continue to generation.
 
 ## Step 14: Record Approval Response
 - Log the user's approval response with timestamp in `aidlc-docs/audit.md`
@@ -281,15 +282,13 @@ If the analysis in step 9 reveals ANY ambiguous answers, you MUST:
 > **You may:**
 >
 > 🔧 **Request Changes** -  Ask for modifications to the stories or personas based on your review  
-> ✅ **Approve & Continue** - Approve user stories and proceed to **Workflow Planning**
+> (Informational only — do not wait.) Continue to **Workflow Planning**. Review is at `inception_end`.
 
 ---
 ```
 
-## Step 21: Wait for Explicit Approval of Generated Stories
-- Do not proceed until the user explicitly approves the generated stories
-- Approval must be clear and unambiguous
-- If user requests changes, update stories and repeat the approval process
+## Step 21: No stories gate
+- Run `python -m aidlc_validate stories --root PRODUCT_REPO`. Do not wait for a person. Continue.
 
 ## Step 22: Record Approval Response
 - Log the user's approval response with timestamp in `aidlc-docs/audit.md`

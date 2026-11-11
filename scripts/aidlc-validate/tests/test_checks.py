@@ -105,7 +105,13 @@ def test_audit_md_in_export_fails():
     assert "audit.md" in err
 
 
-def test_stories_is_stub():
+def test_stories_valid_passes():
     rc, out, err = _run("stories", FIXTURES / "valid")
     assert rc == 0, err
-    assert "stub" in out.lower()
+    assert "stories: pass" in out
+
+
+def test_stories_too_few_ac_fails():
+    rc, _out, err = _run("stories", FIXTURES / "too_few_ac")
+    assert rc == 1
+    assert "min is 2" in err

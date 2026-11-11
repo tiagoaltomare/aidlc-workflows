@@ -26,6 +26,8 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 - Load `common/content-validation.md` for content validation requirements
 - Load `common/question-format-guide.md` for question formatting rules
 - Load `common/config.md` and apply `aidlc.config.yaml` (validate before use; refuse and stop on invalid or unknown schema_version)
+- Load `common/assumptions.md` for blocking vs non-blocking questions
+- Load `common/automatic-checks.md` and `common/inception-autonomy.md`
 - Reference these throughout the workflow execution
 
 ## MANDATORY: Extensions Loading
@@ -90,6 +92,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 - Workflow Planning (ALWAYS)
 - Application Design (CONDITIONAL)
 - Units Generation (CONDITIONAL)
+- Gate `inception_end` (ALWAYS when Inception ran)
 
 ---
 
@@ -221,8 +224,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Generate requirements document
 5. Execute at appropriate depth (minimal/standard/comprehensive)
 6. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-7. **Wait for Explicit Approval**: Follow approval format from requirements-analysis.md detailed steps - DO NOT PROCEED until user confirms
-8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+7. **No stage gate.** Extension opt-in remains a **blocking question** (`common/assumptions.md`). Other questions go to `aidlc-docs/assumptions.md`. Continue to User Stories (if it will run) or Workflow Planning. Human review is at `inception_end`.
 
 ## User Stories (CONDITIONAL)
 
@@ -278,22 +280,21 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 **Note**: If Requirements Analysis executed, Stories can reference and build upon those requirements.
 
 **User Stories has two parts within one stage**:
-1. **Part 1 - Planning**: Create story plan with questions, collect answers, analyze for ambiguities, get approval
-2. **Part 2 - Generation**: Execute approved plan to generate stories and personas
+1. **Part 1 - Planning**: Create story plan; apply `stories.*` from config (do not wait for a plan gate)
+2. **Part 2 - Generation**: Generate stories and personas
 
 **Execution**:
 1. **MANDATORY**: You MUST log any user input during this phase in audit.md
-2. Load all steps from `inception/user-stories.md`
+2. Load all steps from `inception/user-stories.md` and `common/inception-autonomy.md`
 3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
-4. **MANDATORY**: Perform intelligent assessment (Step 1 in user-stories.md) to validate user stories are needed
+4. **MANDATORY**: Perform intelligent assessment (Step 1 in user-stories.md) to validate user stories are needed. Skip remains allowed exactly as in v1
 5. Load reverse engineering artifacts (if brownfield)
-6. If Requirements exist, reference them when creating stories
+6. If Requirements exist, reference them when creating stories. Apply `stories.format`, `invest_required`, `min_acceptance_criteria`, `max_size`
 7. Execute at appropriate depth (minimal/standard/comprehensive)
-8. **PART 1 - Planning**: Create story plan with questions, wait for user answers, analyze for ambiguities, get approval
-9. **PART 2 - Generation**: Execute approved plan to generate stories and personas
+8. **PART 1 - Planning**: Create the story plan from config; non-blocking questions → `assumptions.md`
+9. **PART 2 - Generation**: Generate stories and personas
 10. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-11. **Wait for Explicit Approval**: Follow approval format from user-stories.md detailed steps - DO NOT PROCEED until user confirms
-12. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+11. **No stage gate.** Run `python -m aidlc_validate stories --root PRODUCT_REPO` and `traceability`. Continue. Human review is at `inception_end`.
 
 ## Workflow Planning (ALWAYS EXECUTE)
 
@@ -313,8 +314,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - Generate workflow visualization (VALIDATE Mermaid syntax before writing)
 7. **MANDATORY**: Validate all content before file creation per content-validation.md rules
 8. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-9. **Wait for Explicit Approval**: Present recommendations using language from workflow-planning.md Step 9, emphasizing user control to override recommendations - DO NOT PROCEED until user confirms
-10. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+9. **No stage gate.** Record High/Critical risk; it feeds design validation. Human override is at `inception_end`. Continue.
 
 ## Application Design (CONDITIONAL)
 
@@ -336,8 +336,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 4. Load reverse engineering artifacts (if brownfield)
 5. Execute at appropriate depth (minimal/standard/comprehensive)
 6. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-7. **Wait for Explicit Approval**: Present detailed completion message (see application-design.md for message format) - DO NOT PROCEED until user confirms
-8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+7. **No stage gate.** Check consistency with Tech Env and the current scope. Continue. Human review is at `inception_end`.
 
 ## Units Generation (CONDITIONAL)
 
@@ -358,8 +357,20 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 4. Load reverse engineering artifacts (if brownfield)
 5. Execute at appropriate depth (minimal/standard/comprehensive)
 6. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-7. **Wait for Explicit Approval**: Present detailed completion message (see units-generation.md for message format) - DO NOT PROCEED until user confirms
-8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+7. **No stage gate.** Require an acyclic DAG in `unit-of-work-dependency.md` and honor `units.max_stories_per_unit`. Run `python -m aidlc_validate units-dag --root PRODUCT_REPO` and `traceability`. Continue to `inception_end`.
+
+## Gate `inception_end` (ALWAYS after Inception)
+
+Not a generation stage. Present the Inception package and **wait for explicit approval** before Construction:
+
+- Diff of the current scope vs stories (in-scope covered, in-scope missing, extras)
+- `aidlc-docs/assumptions.md`
+- Check results (`traceability`, `stories` if Stories ran, `units-dag` if Units ran)
+- SKIPs and depths from Workflow Planning, including Operations stages
+- Unit DAG and story map
+- Extensions opted in and refused
+
+The person may change any Inception artifact. Do not start Construction until they approve. Log the raw reply in `audit.md`.
 
 ---
 
