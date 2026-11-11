@@ -1,6 +1,6 @@
 # User Stories - Detailed Steps
 
-> Autonomous Inception: `common/inception-autonomy.md` removes the plan gate and the stories gate. Apply `stories.*` from config. Review is at `inception_end`. The stage stays conditional (v1 skip rules still apply).
+**Autonomous Inception:** `common/inception-autonomy.md` removes the plan gate and the stories gate. Apply `stories.*` from config. Review is at `inception_end`. The stage stays conditional (v1 skip rules still apply).
 
 ## Purpose
 **Convert requirements into user-centered stories with acceptance criteria**

@@ -1,6 +1,6 @@
 # Application Design - Detailed Steps
 
-> Autonomous Inception: `common/inception-autonomy.md` removes the stage-completion gate. The stage stays conditional. Review is at `inception_end`.
+**Autonomous Inception:** `common/inception-autonomy.md` removes the stage-completion gate. The stage stays conditional. Review is at `inception_end`.
 
 ## Purpose
 **High-level component identification and service layer design**

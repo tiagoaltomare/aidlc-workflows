@@ -1,6 +1,6 @@
 # Units Generation - Detailed Steps
 
-> Autonomous Inception: `common/inception-autonomy.md` removes the plan gate and the generation gate. Require an acyclic DAG. Review is at `inception_end`. The stage stays conditional.
+**Autonomous Inception:** `common/inception-autonomy.md` removes the plan gate and the generation gate. Require an acyclic DAG. Review is at `inception_end`. The stage stays conditional.
 
 ## Overview
 This stage decomposes the system into manageable units of work through two integrated parts:
