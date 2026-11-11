@@ -1,5 +1,7 @@
 # NFR Requirements
 
+**Autonomous Construction:** no 2-option stage gate. Continue to NFR Design or Design Validation.
+
 > **OVERRIDE**: ALL steps in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. Every step MUST be executed including all sub-tasks. The model MUST NOT skip them, combine them, or treat them as optional.
 
 ## Prerequisites
@@ -129,10 +131,8 @@ Using the rule × component matrix from Step 2, generate the NFR requirements pl
 ---
 ```
 
-### Step 9: Wait for Explicit Approval
-- Do not proceed until the user explicitly approves the NFR requirements
-- Approval must be clear and unambiguous
-- If user requests changes, update the requirements and repeat the approval process
+### Step 9: No stage gate
+- Do not wait. Continue to NFR Design or Design Validation.
 
 ### Step 10: Record Approval and Update Progress
 - Log approval in audit.md with timestamp

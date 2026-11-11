@@ -381,13 +381,14 @@ The person may change any Inception artifact. Do not start Construction until th
 **Focus**: Determine HOW to build it
 
 **Stages in CONSTRUCTION PHASE**:
-- Per-Unit Loop (executes for each unit):
+- Per-Unit Loop (executes for each unit, DAG order):
   - Functional Design (CONDITIONAL, per-unit)
   - NFR Requirements (CONDITIONAL, per-unit)
   - NFR Design (CONDITIONAL, per-unit)
   - Infrastructure Design (CONDITIONAL, per-unit)
+  - Design Validation (ALWAYS after that unit's designs; default `hybrid`)
   - Code Generation (ALWAYS, per-unit)
-- Build and Test (ALWAYS - after all units complete)
+- Build and Test (ALWAYS - after all units complete; gate `build_and_test`)
 
 **Note**: Each unit is completed fully (design + code) before moving to the next unit.
 
@@ -414,9 +415,7 @@ The person may change any Inception artifact. Do not start Construction until th
 3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
 4. Execute functional design for this unit
 5. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-6. **MANDATORY**: You MUST present standardized 2-option completion message as defined in functional-design.md - DO NOT use emergent 3-option behavior
-7. **Wait for Explicit Approval**: User must choose between "Request Changes" or "Continue to Next Stage" - DO NOT PROCEED until user confirms
-8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+6. **No stage gate.** Continue to the next design stage of this unit (or Design Validation when designs for the unit are done).
 
 ### NFR Requirements (CONDITIONAL, per-unit)
 
@@ -436,9 +435,7 @@ The person may change any Inception artifact. Do not start Construction until th
 3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
 4. Execute NFR assessment for this unit
 5. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-6. **MANDATORY**: You MUST present standardized 2-option completion message as defined in nfr-requirements.md - DO NOT use emergent behavior
-7. **Wait for Explicit Approval**: User must choose between "Request Changes" or "Continue to Next Stage" - DO NOT PROCEED until user confirms
-8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+6. **No stage gate.** Continue to NFR Design or Design Validation.
 
 ### NFR Design (CONDITIONAL, per-unit)
 
@@ -456,9 +453,7 @@ The person may change any Inception artifact. Do not start Construction until th
 3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
 4. Execute NFR design for this unit
 5. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-6. **MANDATORY**: You MUST present standardized 2-option completion message as defined in nfr-design.md - DO NOT use emergent behavior
-7. **Wait for Explicit Approval**: User must choose between "Request Changes" or "Continue to Next Stage" - DO NOT PROCEED until user confirms
-8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+6. **No stage gate.** Continue to Infrastructure Design or Design Validation.
 
 ### Infrastructure Design (CONDITIONAL, per-unit)
 
@@ -477,31 +472,34 @@ The person may change any Inception artifact. Do not start Construction until th
 3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
 4. Execute infrastructure design for this unit
 5. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-6. **MANDATORY**: You MUST present standardized 2-option completion message as defined in infrastructure-design.md - DO NOT use emergent behavior
-7. **Wait for Explicit Approval**: User must choose between "Request Changes" or "Continue to Next Stage" - DO NOT PROCEED until user confirms
-8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
-9. **If any extensions are active**: Produce extension plan rule mapping for this unit's resources and present rule mapping completion message as defined in infrastructure-design.md - DO NOT use emergent behavior
-10. **Wait for Explicit Approval**: User must approve the rule mapping before proceeding - DO NOT PROCEED until user confirms
-11. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+6. **No stage gate.** If extensions are active, produce the extension plan rule mapping (keep the v1-operations artifact) and feed it into Design Validation. Do not wait here.
+7. Continue to Design Validation for this unit.
+
+### Design Validation (ALWAYS, per-unit, after that unit's designs)
+
+1. Load `construction/design-validation.md`
+2. Default `design_validation.mode` is `hybrid`
+3. Run executable checks. Use a **separate** LLM reviewer; it must not self-approve
+4. Escalate to the person when a hybrid trigger fires, rework limit is exceeded, or the token budget is exceeded (`pause_and_ask_human`)
+5. Write `aidlc-docs/construction/{unit}/design-validation.md`
+6. On pass, continue to Code Generation for this unit. On rework, return to the design stages of the same unit
 
 ### Code Generation (ALWAYS EXECUTE, per-unit)
 
 **Always executes for each unit**
 
 **Code Generation has two parts within one stage**:
-1. **Part 1 - Planning**: Create detailed code generation plan with explicit steps
-2. **Part 2 - Generation**: Execute approved plan to generate code, tests, and artifacts
+1. **Part 1 - Planning**: Create the code generation plan with checkboxes (no human plan approval in autonomous mode)
+2. **Part 2 - Generation**: Execute the plan to generate code, tests, and artifacts
 
 **Execution**:
 1. **MANDATORY**: You MUST log any user input during this stage in audit.md
 2. Load all steps from `construction/code-generation.md`
 3. **MANDATORY**: You MUST record all steps identified in the loaded rule file in `aidlc-docs/step-decision-log.md` before executing any of them.
-4. **PART 1 - Planning**: Create code generation plan with checkboxes, get user approval
-5. **PART 2 - Generation**: Execute approved plan to generate code for this unit
+4. **PART 1 - Planning**: Write the plan with checkboxes. Do not wait for a person
+5. **PART 2 - Generation**: Execute the plan for this unit
 6. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-7. **MANDATORY**: You MUST present standardized 2-option completion message as defined in code-generation.md - DO NOT use emergent behavior
-8. **Wait for Explicit Approval**: User must choose between "Request Changes" or "Continue to Next Stage" - DO NOT PROCEED until user confirms
-9. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+7. **No stage gate.** Continue to the next unit in DAG order, or to Build and Test when units are done. Blocking questions still stop the run (`common/assumptions.md`).
 
 ---
 
@@ -518,7 +516,7 @@ The person may change any Inception artifact. Do not start Construction until th
    - Additional test instructions as needed (contract tests, security tests, e2e tests)
 5. Create instruction files in build-and-test/ subdirectory: build-instructions.md, unit-test-instructions.md, integration-test-instructions.md, performance-test-instructions.md, build-and-test-summary.md
 6. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
-7. **Wait for Explicit Approval**: Ask: "**Build and test instructions complete. Ready to proceed to Operations stage?**" - DO NOT PROCEED until user confirms
+7. **Wait for Explicit Approval** (gate `build_and_test`): Ask: "**Build and test instructions complete. Ready to proceed to Operations stage?**" - DO NOT PROCEED until user confirms. This gate is the door into Operations.
 8. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
 
 ---
@@ -530,9 +528,11 @@ The person may change any Inception artifact. Do not start Construction until th
 **Focus**: Verify WHAT was built meets the rules, deploy it, and prove it works
 
 **Stages in OPERATIONS PHASE**:
-- Rules Validation (CONDITIONAL)
-- Deployment (CONDITIONAL)
-- Post-Deployment Testing (CONDITIONAL)
+- Rules Validation (CONDITIONAL) — keep the v1-operations checkpoint
+- Deployment (CONDITIONAL) — keep opt-in and v1-operations checkpoints
+- Post-Deployment Testing (CONDITIONAL) — keep the v1-operations checkpoint
+- Docusaurus Export (ALWAYS)
+- Gate `operations`
 
 ---
 
@@ -609,6 +609,24 @@ The person may change any Inception artifact. Do not start Construction until th
 5. **MANDATORY**: You MUST verify the step-decision-log entry for this stage is complete and step counts match before presenting completion. For any missing step: re-execute it and all steps that depend on its output. Update the log. You MUST NOT present completion until all steps are logged.
 6. **Wait for Explicit Approval**: Present standardized 2-option completion message - DO NOT PROCEED until user confirms
 7. **MANDATORY**: You MUST log user's response in audit.md with complete raw input
+8. Continue to Docusaurus Export even if this stage was SKIPPED (no deploy)
+
+## Docusaurus Export (ALWAYS EXECUTE)
+
+Runs after Post-Deployment Testing, including when PDT or Deployment was SKIPPED.
+
+1. **MANDATORY**: You MUST log start of Docusaurus export in audit.md
+2. Load `operations/docusaurus-export.md`
+3. Copy or refresh `templates/docusaurus-scaffold/` into `operations.docusaurus_path` (default `docs-site`) if `package.json` is missing
+4. Export included sources; omit `audit.md`, question files, raw plans, `deployment-deploy.md`
+5. Set site language from `operations.docs.language` (default `en`)
+6. Run `npm install` and `npm run build` in the docs-site folder
+7. Run `python -m aidlc_validate export --root PRODUCT_REPO`
+8. Write `aidlc-docs/operations/docusaurus-export.md`
+
+## Gate `operations` (ALWAYS after export)
+
+Present `operations-summary.md`, the docs-site, SKIPPED deploy/PDT if any, and the proposed delivered-feature marks. **Wait for Explicit Approval.** Only after approval, mark in-scope features delivered on the Vision. Log the raw reply in `audit.md`.
 
 ## Key Principles
 
@@ -622,7 +640,7 @@ The person may change any Inception artifact. Do not start Construction until th
   - **CRITICAL**: Log every interaction, not just approvals
 - **Quality Focus**: Complex changes get full treatment, simple changes stay efficient
 - **Content Validation**: Always validate content before file creation per content-validation.md rules
-- **NO EMERGENT BEHAVIOR**: Construction phases MUST use standardized 2-option completion messages as defined in their respective rule files. DO NOT create 3-option menus or other emergent navigation patterns.
+- **NO EMERGENT BEHAVIOR**: Construction design stages have no 2-option stage gate; Design Validation and `build_and_test` are the control points. Operations keeps the v1-operations checkpoints plus gate `operations`.
 
 ## MANDATORY: Plan-Level Checkbox Enforcement
 

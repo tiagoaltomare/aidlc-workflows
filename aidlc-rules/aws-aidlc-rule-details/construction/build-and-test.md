@@ -431,10 +431,10 @@ Review the summary in aidlc-docs/construction/build-and-test/build-and-test-summ
 
 ---
 
-## Step 13: Wait for Explicit Approval
+## Step 13: Wait for Explicit Approval (gate `build_and_test`)
 
-- Do not proceed until the user explicitly approves
-- If user requests changes, address them and repeat the approval process
+- Do not proceed to Operations until the person approves
+- If they request changes, address them and repeat the approval process
 
 ---
 

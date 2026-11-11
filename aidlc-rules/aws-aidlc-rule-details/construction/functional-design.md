@@ -1,5 +1,7 @@
 # Functional Design
 
+**Autonomous Construction:** no 2-option stage gate. After this unit's designs, run `construction/design-validation.md`. The `build_and_test` gate stays.
+
 ## Purpose
 **Detailed business logic design per unit**
 
@@ -108,10 +110,8 @@ Design detailed business logic for the unit, technology-agnostic and focused pur
 ---
 ```
 
-### Step 8: Wait for Explicit Approval
-- Do not proceed until the user explicitly approves the functional design
-- Approval must be clear and unambiguous
-- If user requests changes, update the design and repeat the approval process
+### Step 8: No stage gate
+- Do not wait. Continue to the next design stage of this unit or to Design Validation.
 
 ### Step 9: Record Approval and Update Progress
 - Log approval in audit.md with timestamp

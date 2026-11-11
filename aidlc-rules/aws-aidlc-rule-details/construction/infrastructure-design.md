@@ -1,5 +1,7 @@
 # Infrastructure Design
 
+**Autonomous Construction:** no 2-option stage gate after the design. Keep producing the v1-operations rule mapping when extensions are active; feed it to Design Validation instead of waiting here.
+
 > **OVERRIDE**: Steps 10–18 in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. When extensions are active, Steps 10–18 MUST be executed. The model MUST NOT skip them, combine them, or treat them as optional. These steps produce the extension plan rule mapping which is a required input to Code Generation.
 
 ## Prerequisites
@@ -90,10 +92,8 @@ Map logical software components to actual infrastructure choices for deployment 
 ---
 ```
 
-### Step 8: Wait for Explicit Approval
-- Do not proceed until the user explicitly approves the infrastructure design
-- Approval must be clear and unambiguous
-- If user requests changes, update the design and repeat the approval process
+### Step 8: No stage gate
+- Do not wait. If extensions are active, continue through the rule-mapping steps and then Design Validation.
 
 ### Step 9: Record Approval
 - Log approval in audit.md with timestamp
@@ -227,10 +227,8 @@ B) Select specific journeys: [list numbers]
 ---
 ```
 
-### Step 17: Wait for Explicit Approval
-- Do not proceed until the user explicitly approves the rule mapping, or has been skipped to from Step 10 and confirms no extensions are active
-- Approval must be clear and unambiguous
-- If user requests changes, update the mapping and repeat the approval process
+### Step 17: No mapping gate
+- Do not wait here. Attach the rule mapping to the Design Validation report. Escalate only if a hybrid trigger fires (`construction/design-validation.md`).
 
 ### Step 18: Record Approval and Update Progress
 - Log approval in audit.md with timestamp

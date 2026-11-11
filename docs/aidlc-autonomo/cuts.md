@@ -11,3 +11,6 @@ run end to end. Each row is a deliberate cut, not an accidental omission.
 | F2    | Portal skills not copied; writing-inputs guides used as structure | Skills stay interactive and root-file oriented; composite stage replaces that behaviour               |
 | F3    | Full INVEST scoring and breakdown-strategy enforcement            | Deadline: stories check enforces As a / I want plus min/max AC counts                                 |
 | F3    | No Python subcommand for assumptions or Vision/Tech consistency   | Agent inspects `assumptions.md` and Tech Env; executable checks stay the six CLI subcommands          |
+| F4    | No separate LLM-reviewer harness (process rule only)              | Deadline: hybrid mode is specified in rules; a second model is not spawned by this repo               |
+| F5    | F6 documentation polish (`process-overview`, user guides)         | Lowest priority; rules in `core-workflow.md` are enough for a pilot agent                             |
+| F5    | Webpack pinned to 5.101.3 in the Docusaurus scaffold              | Newer webpack ProgressPlugin breaks Docusaurus 3.9 `webpackbar` on Node 22                            |

@@ -1,5 +1,7 @@
 # Code Generation - Detailed Steps
 
+**Autonomous Construction:** the code-generation plan still exists with checkboxes, but there is no human plan approval. Execute the plan. Next unit follows the DAG. `build_and_test` stays a human gate.
+
 > **OVERRIDE**: Steps 4–7 in this file are exempt from the Adaptive Workflow Principle, adaptive depth, and any rule that permits the model to skip steps or apply judgement about whether to follow instructions. When extensions are active, Steps 4–7 MUST be executed. The model MUST NOT skip them, combine them, or treat them as optional. These steps produce the per-resource extension code plan which ensures every rule × resource combination has its own checklist item in the final code generation plan.
 
 ## Overview
@@ -119,10 +121,9 @@ This stage generates code for each unit of work through two integrated parts:
 - [ ] Include reference to the complete unit code generation plan
 - [ ] Use ISO 8601 timestamp format
 
-## Step 12: Wait for Explicit Approval
-- [ ] Do not proceed until the user explicitly approves the unit code generation plan
-- [ ] Approval must cover the entire plan and generation sequence
-- [ ] If user requests changes, update the plan and repeat approval process
+## Step 12: No plan-approval gate
+- [ ] Do not wait for a person. Execute the plan (Part 2)
+- [ ] Blocking questions still stop the run (`common/assumptions.md`)
 
 ## Step 13: Record Approval Response
 - [ ] Log the user's approval response with timestamp in `aidlc-docs/audit.md`
@@ -207,10 +208,8 @@ Validation check:
 ---
 ```
 
-## Step 20: Wait for Explicit Approval
-- Do not proceed until the user explicitly approves the generated code
-- Approval must be clear and unambiguous
-- If user requests changes, update the code and repeat the approval process
+## Step 20: No stage gate
+- Do not wait. Continue to the next unit in DAG order, or to Build and Test.
 
 ## Step 21: Record Approval and Update Progress
 - Log approval in audit.md with timestamp
