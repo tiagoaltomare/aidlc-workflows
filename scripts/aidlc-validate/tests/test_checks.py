@@ -1,0 +1,111 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from aidlc_validate.cli import main
+
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+
+
+def _run(check: str, root: Path) -> tuple[int, str, str]:
+    from io import StringIO
+    import sys
+
+    stdout, stderr = StringIO(), StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = stdout, stderr
+        rc = main([check, "--root", str(root)])
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err
+    return rc, stdout.getvalue(), stderr.getvalue()
+
+
+def test_valid_config_passes():
+    rc, out, err = _run("config", FIXTURES / "valid")
+    assert rc == 0, err
+    assert "config: pass" in out
+
+
+def test_example_yaml_validates(tmp_path: Path):
+    repo = Path(__file__).resolve().parents[3]
+    example = repo / "docs" / "aidlc.config.example.yaml"
+    (tmp_path / "aidlc.config.yaml").write_text(
+        example.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    rc, out, err = _run("config", tmp_path)
+    assert rc == 0, err
+    assert "pass" in out
+
+
+def test_invalid_config_refused():
+    rc, _out, err = _run("config", FIXTURES / "invalid_config")
+    assert rc == 1
+    assert "schema error" in err or "invalid" in err.lower()
+
+
+def test_unknown_schema_version_refused():
+    rc, _out, err = _run("config", FIXTURES / "unknown_schema")
+    assert rc == 1
+    assert "unknown schema_version" in err
+
+
+def test_valid_units_dag_passes():
+    rc, out, err = _run("units-dag", FIXTURES / "valid")
+    assert rc == 0, err
+    assert "units-dag: pass" in out
+
+
+def test_cyclic_dag_fails():
+    rc, _out, err = _run("units-dag", FIXTURES / "cyclic_dag")
+    assert rc == 1
+    assert "cycle" in err.lower()
+
+
+def test_undeclared_unit_fails():
+    rc, _out, err = _run("units-dag", FIXTURES / "undeclared_unit")
+    assert rc == 1
+    assert "undeclared" in err.lower()
+
+
+def test_valid_traceability_passes():
+    rc, out, err = _run("traceability", FIXTURES / "valid")
+    assert rc == 0, err
+    assert "traceability: pass" in out
+
+
+def test_out_of_scope_in_stories_fails():
+    rc, _out, err = _run("traceability", FIXTURES / "out_of_scope_in_stories")
+    assert rc == 1
+    assert "out-of-scope" in err.lower()
+
+
+def test_valid_scope_in_vision_passes():
+    rc, out, err = _run("scope-in-vision", FIXTURES / "valid")
+    assert rc == 0, err
+    assert "scope-in-vision: pass" in out
+
+
+def test_in_scope_feature_missing_from_features_fails():
+    rc, _out, err = _run("scope-in-vision", FIXTURES / "missing_feature")
+    assert rc == 1
+    assert "does not resolve" in err
+    assert "FEAT-999" in err
+
+
+def test_valid_export_passes():
+    rc, out, err = _run("export", FIXTURES / "valid")
+    assert rc == 0, err
+    assert "export: pass" in out
+
+
+def test_audit_md_in_export_fails():
+    rc, _out, err = _run("export", FIXTURES / "export_with_audit")
+    assert rc == 1
+    assert "audit.md" in err
+
+
+def test_stories_is_stub():
+    rc, out, err = _run("stories", FIXTURES / "valid")
+    assert rc == 0, err
+    assert "stub" in out.lower()

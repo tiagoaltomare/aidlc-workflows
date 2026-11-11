@@ -24,6 +24,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 - Load `common/session-continuity.md` for session resumption guidance
 - Load `common/content-validation.md` for content validation requirements
 - Load `common/question-format-guide.md` for question formatting rules
+- Load `common/config.md` and apply `aidlc.config.yaml` (validate before use; refuse and stop on invalid or unknown schema_version). Stage behaviour is unchanged: still AI-DLC 1.0.1, Operations remains a placeholder
 - Reference these throughout the workflow execution
 
 ## MANDATORY: Extensions Loading (Context-Optimized)

@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tiagoaltomare/aidlc-workflows/schemas/aidlc.config.schema.json",
+  "title": "aidlc.config.yaml",
+  "description": "Product-repository configuration for the AI-DLC autonomous fork (schema_version 1).",
+  "type": "object",
+  "required": ["schema_version"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "project_type": {
+      "type": "string",
+      "enum": ["greenfield", "brownfield"]
+    },
+    "depth": {
+      "type": "string",
+      "enum": ["minimal", "standard", "comprehensive"]
+    },
+    "vision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vision_path": { "type": "string", "minLength": 1 },
+        "tech_env_path": { "type": "string", "minLength": 1 },
+        "features_path": { "type": "string", "minLength": 1 },
+        "reuse_policy": {
+          "type": "string",
+          "enum": ["reuse_if_present", "regenerate", "reuse_and_fill_gaps"]
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "current_path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "stories": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": { "type": "string", "minLength": 1 },
+        "invest_required": { "type": "boolean" },
+        "max_size": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "story_points": { "type": "integer", "minimum": 1 },
+            "max_acceptance_criteria": { "type": "integer", "minimum": 1 },
+            "max_components_touched": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "breakdown_strategy": {
+          "type": "string",
+          "enum": ["user_journey", "feature", "persona", "domain", "epic"]
+        },
+        "min_acceptance_criteria": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "units": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_stories_per_unit": { "type": "integer", "minimum": 1 },
+        "parallelism": { "type": "string", "enum": ["sequential"] }
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "opt_in": {
+          "type": "string",
+          "enum": ["blocking_question", "from_config", "preset_default"]
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "human": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "severity"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "severity": { "type": "string", "enum": ["blocking", "advisory"] }
+            }
+          }
+        }
+      }
+    },
+    "design_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["auto", "human", "hybrid"],
+          "default": "hybrid"
+        },
+        "human_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "persistent_data",
+              "security",
+              "public_contract",
+              "external_integration",
+              "risk_high_or_critical",
+              "rework_limit_exceeded",
+              "no_executable_check"
+            ]
+          }
+        },
+        "separate_llm_reviewer": { "type": "boolean" }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_rework_iterations_per_unit": { "type": "integer", "minimum": 1 },
+        "token_budget_per_unit": { "type": "integer", "minimum": 1 },
+        "on_token_budget_exceeded": {
+          "type": "string",
+          "enum": ["pause_and_ask_human", "log_and_continue", "abort_unit"]
+        }
+      }
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "docusaurus_path": { "type": "string", "minLength": 1 },
+        "export_default": { "type": "boolean" },
+        "docs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "language": { "type": "string", "minLength": 1, "default": "en" }
+          }
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "vision",
+              "technical_environment",
+              "features",
+              "scopes",
+              "requirements",
+              "user_stories",
+              "application_design",
+              "units",
+              "construction_designs",
+              "build_and_test_summary",
+              "operations_summary",
+              "rules_validation_report",
+              "post_deployment_test_report"
+            ]
+          }
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["audit", "question_files", "raw_plans", "deployment_deploy_log"]
+          }
+        }
+      }
+    }
+  }
+}

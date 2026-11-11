@@ -1,0 +1,103 @@
+# aidlc.config.yaml
+schema_version: "1"
+
+project_type: greenfield  # greenfield | brownfield
+# Na prática o Workspace Detection confirma pelo codebase;
+# este campo é a declaração do projeto e deve ser reconciliado com o que for detectado.
+
+depth: standard  # minimal | standard | comprehensive  (regra oficial da v1)
+
+vision:
+  vision_path: aidlc-docs/vision/vision-document.md          # decisão do Tiago
+  tech_env_path: aidlc-docs/vision/technical-environment.md  # decisão do Tiago
+  features_path: aidlc-docs/vision/features.md               # default proposto pelo PM, Tiago pode mudar
+  reuse_policy: reuse_if_present  # default proposto pelo PM, Tiago pode mudar
+  # reuse_if_present | regenerate | reuse_and_fill_gaps
+
+scope:
+  current_path: aidlc-docs/vision/scopes/scope-atual.md      # default proposto pelo PM, Tiago pode mudar
+  # Cada arquivo de escopo referencia a versão do Vision e os ids de features.
+
+stories:
+  format: "as_a_i_want_so_that+gherkin"  # exemplo; "As a / I want / So that" + Given/When/Then
+  invest_required: true
+  max_size:
+    story_points: 5
+    max_acceptance_criteria: 5
+    max_components_touched: 3
+  breakdown_strategy: user_journey     # user_journey | feature | persona | domain | epic
+  min_acceptance_criteria: 2
+
+units:
+  max_stories_per_unit: 8
+  parallelism: sequential              # default da v1: loop em série
+
+extensions:
+  opt_in: blocking_question            # default proposto pelo PM, Tiago pode mudar
+  # blocking_question | from_config | preset_default
+
+gates:
+  human:
+    - reverse_engineering              # default proposto pelo PM, Tiago pode mudar; só quando o RE roda
+    - vision_scope
+    - inception_end
+    - build_and_test                   # default proposto pelo PM, Tiago pode mudar
+    - operations
+    # Checkpoints herdados da v1-operations (Rules Validation, Deployment, Post-Deployment Testing)
+    # permanecem nas regras desses estágios.
+  checks:
+    - id: traceability
+      severity: blocking
+    - id: story_standard
+      severity: blocking
+    - id: units_dag
+      severity: blocking
+    - id: assumptions_complete
+      severity: blocking
+    - id: vision_tech_consistency
+      severity: blocking
+    - id: scope_in_vision
+      severity: blocking
+
+design_validation:
+  mode: hybrid  # decisão do Tiago; auto | human | hybrid
+  human_triggers:
+    - persistent_data
+    - security
+    - public_contract
+    - external_integration
+    - risk_high_or_critical
+    - rework_limit_exceeded
+    - no_executable_check
+  separate_llm_reviewer: true  # obrigatório no modo hybrid / auto que use revisor LLM
+
+limits:
+  max_rework_iterations_per_unit: 3
+  token_budget_per_unit: 200000
+  on_token_budget_exceeded: pause_and_ask_human  # default proposto pelo PM, Tiago pode mudar
+  # pause_and_ask_human | log_and_continue | abort_unit
+
+operations:
+  docusaurus_path: docs-site           # default proposto pelo PM, Tiago pode mudar
+  export_default: true
+  docs:
+    language: en                       # campo: decisão do Tiago; valor default: proposto pelo PM, Tiago pode mudar
+  include:                             # default proposto pelo PM, Tiago pode mudar
+    - vision
+    - technical_environment
+    - features
+    - scopes
+    - requirements
+    - user_stories
+    - application_design
+    - units
+    - construction_designs
+    - build_and_test_summary
+    - operations_summary
+    - rules_validation_report
+    - post_deployment_test_report
+  exclude:                             # default proposto pelo PM, Tiago pode mudar
+    - audit
+    - question_files
+    - raw_plans
+    - deployment_deploy_log
