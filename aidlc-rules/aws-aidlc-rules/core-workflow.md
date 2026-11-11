@@ -25,7 +25,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
 - Load `common/session-continuity.md` for session resumption guidance
 - Load `common/content-validation.md` for content validation requirements
 - Load `common/question-format-guide.md` for question formatting rules
-- Load `common/config.md` and apply `aidlc.config.yaml` (validate before use; refuse and stop on invalid or unknown schema_version). Stage behaviour is unchanged: still AI-DLC 1.0.1, Operations remains a placeholder
+- Load `common/config.md` and apply `aidlc.config.yaml` (validate before use; refuse and stop on invalid or unknown schema_version)
 - Reference these throughout the workflow execution
 
 ## MANDATORY: Extensions Loading
@@ -140,6 +140,7 @@ All subsequent rule detail file references (e.g., `common/process-overview.md`, 
    - You MUST create `aidlc-docs/operations/retrofit-archive/`
    - You MUST copy `aidlc-docs/aidlc-state.md` to `aidlc-docs/operations/retrofit-archive/aidlc-state.md`
    - You MUST copy `aidlc-docs/audit.md` to `aidlc-docs/operations/retrofit-archive/audit.md`
+   - You MUST NOT delete, move, or regenerate `aidlc-docs/vision/`. A retrofit must not wipe a versioned Vision, Tech Env, feature catalog, or scopes.
 7. You MUST reset aidlc-state.md:
    - **SET**: Project Type to `Brownfield (Operations Retrofit)`
    - **KEEP**: Project Information (except Project Type), Workspace State, Code Location Rules, Architectural Decisions
