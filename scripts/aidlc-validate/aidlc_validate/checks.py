@@ -422,6 +422,17 @@ SKIP_SITE_DIRS = frozenset({"node_modules", "build", ".docusaurus"})
 ANSWER_LINE_RE = re.compile(r"^\s*\[Answer\]:", re.M)
 
 
+def _contained_under(root: Path, path: Path) -> Path | None:
+    """Resolved *path* if it stays inside *root* after following symlinks.
+
+    Rejects ``..`` segments and absolute paths that leave the project.
+    """
+    resolved = path.resolve()
+    if resolved.is_relative_to(root.resolve()):
+        return resolved
+    return None
+
+
 def _iter_site_paths(site: Path, pattern: str = "*"):
     """Walk the docs-site tree, skipping install and build output."""
     for path in site.rglob(pattern):
@@ -591,9 +602,12 @@ def check_export(root: Path) -> list[str]:
     if errors:
         return errors
     assert cfg is not None
+    root = root.resolve()
     ops = cfg.get("operations") or {}
     site_rel = ops.get("docusaurus_path") or "docs-site"
-    site = root / site_rel
+    site = _contained_under(root, root / site_rel)
+    if site is None:
+        return [f"export: docusaurus_path escapes project root: {site_rel}"]
     if not site.is_dir():
         return [f"export: docs-site folder missing: {site_rel}"]
     include = ops.get("include") or DEFAULT_INCLUDE
@@ -649,11 +663,11 @@ def check_export(root: Path) -> list[str]:
                 f"export: unescaped [Answer]: line in {rel} "
                 r"(rewrite as \[Answer\]: or wrap so it is not a link reference)"
             )
-    errors.extend(_prove_docusaurus_build(site, ops))
+    errors.extend(_prove_docusaurus_build(site, ops, root))
     return errors
 
 
-def _prove_docusaurus_build(site: Path, ops: dict) -> list[str]:
+def _prove_docusaurus_build(site: Path, ops: dict, root: Path) -> list[str]:
     """Run ``npm run build`` when the site has a package.json, or when asked."""
     prove = ops.get("prove_build")
     pkg = site / "package.json"
@@ -673,10 +687,13 @@ def _prove_docusaurus_build(site: Path, ops: dict) -> list[str]:
             "(operations.prove_build or docs-site/package.json) "
             "but node/npm is not available"
         ]
+    contained = _contained_under(root, site)
+    if contained is None:
+        return [f"export: docusaurus_path escapes project root: {site}"]
     try:
         proc = subprocess.run(
             [npm, "run", "build"],
-            cwd=site,
+            cwd=contained,
             capture_output=True,
             text=True,
             timeout=120,

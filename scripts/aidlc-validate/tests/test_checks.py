@@ -480,6 +480,33 @@ def test_export_prove_build_false_skips_failing_script(tmp_path: Path):
     assert "export: pass" in out
 
 
+def test_export_docusaurus_path_escape_fails(tmp_path: Path):
+    repo = _copy_valid(tmp_path)
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "package.json").write_text(
+        json.dumps({"scripts": {"build": 'node -e "process.exit(0)"'}}),
+        encoding="utf-8",
+    )
+    _update_config(
+        repo, operations={"docusaurus_path": "../outside", "prove_build": True}
+    )
+    rc, _out, err = _run("export", repo)
+    assert rc == 1
+    assert "escapes project root" in err
+    assert "../outside" in err
+
+    link = repo / "docs-site-link"
+    link.symlink_to(outside)
+    _update_config(
+        repo, operations={"docusaurus_path": "docs-site-link", "prove_build": True}
+    )
+    rc, _out, err = _run("export", repo)
+    assert rc == 1
+    assert "escapes project root" in err
+    assert "docs-site-link" in err
+
+
 def test_assumptions_duplicate_id_fails(tmp_path: Path):
     (tmp_path / "aidlc-docs").mkdir()
     (tmp_path / "aidlc-docs" / "assumptions.md").write_text(

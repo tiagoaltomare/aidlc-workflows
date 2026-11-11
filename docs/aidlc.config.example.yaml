@@ -85,7 +85,7 @@ limits:
   # pause_and_ask_human | log_and_continue | abort_unit
 
 operations:
-  docusaurus_path: docs-site           # PM default; Tiago may change
+  docusaurus_path: docs-site           # must resolve inside the project root
   export_default: true
   # prove_build: omitted. When docs-site/package.json exists, export runs
   # `npm run build`. Set true to require that build even without package.json
